@@ -48,9 +48,11 @@ def index():
         return redirect(url_for('login'))
     return redirect(url_for('home'))
 
-@app.route('/home')
+@app.route('/home', methods = ['GET','POST'])
 @login_required
 def home():
+    user_status = "Logged In"
+    
     if request.method == 'POST':
         # Handle adding transactions
         transaction = Transaction(
@@ -79,7 +81,8 @@ def home():
         t.amount if t.type == 'Income' else -t.amount for t in transactions
     )        
     
-    return render_template('home.html', transactions=transactions, balance=balance, initial_balance=initial_balance)
+    return render_template('home.html', transactions=transactions, balance=balance, initial_balance=initial_balance,
+                           user=current_user,status=user_status)
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired(), Length(min=4, max=20)])
