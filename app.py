@@ -42,6 +42,8 @@ class InitialBalance(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     balance = db.Column(db.Float, nullable=False)
 
+# Routes
+
 @app.route('/')
 def index():
     if not current_user.is_authenticated:
@@ -84,18 +86,30 @@ def home():
     return render_template('home.html', transactions=transactions, balance=balance, initial_balance=initial_balance,
                            user=current_user,status=user_status)
 
-class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=20)])
-    password = PasswordField('Password', validators=[InputRequired(), Length(min=4, max=20)])
-    confirm = PasswordField('Confirm Password', validators=[InputRequired(), Length(min=4, max=20)])
-    submit = SubmitField('Register')
+@app.route('/edit/<int:transaction_id>', methods=['GET','POST'])
+@login_required
+def edit_transaction(transaction_id):
+    transaction = Transaction.query.get_or_404(transaction_id)
+    if request.method == 'POST':
+        transaction.date  = request.form['date']
+        transaction.description = request.form['description']
+        transaction.amount = float(request.form['amount'])
+        transaction.type = request.form['type']
+        db.session.commit()
+        flash('Transaction Upldated Successfully', 'success')
+        return redirect(url_for('home'))
+    return render_template('edit_transaction.html', transaction=transaction)
 
-class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=20)])
-    password = PasswordField('Password', validators=[InputRequired(), Length(min=4, max=20)])
-    submit = SubmitField('Login')
+@app.route('/delete/<int:transaction_id>', methods=['POST'])
+@login_required
+def delete_transaction(transaction_id):
+    transaction = Transaction.query.get_or_404(transaction_id)
+    db.session.delete(transaction)
+    db.session.commit()
+    flash('Your Transaction Deleted!', 'danger')
+    return redirect(url_for('home'))
+
     
-# Routes
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
@@ -163,6 +177,18 @@ def set_initial_balance():
     db.session.query(Transaction).delete()
     db.session.commit()
     return redirect(url_for('home'))
+
+class RegistrationForm(FlaskForm):
+    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=20)])
+    password = PasswordField('Password', validators=[InputRequired(), Length(min=4, max=20)])
+    confirm = PasswordField('Confirm Password', validators=[InputRequired(), Length(min=4, max=20)])
+    submit = SubmitField('Register')
+
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=20)])
+    password = PasswordField('Password', validators=[InputRequired(), Length(min=4, max=20)])
+    submit = SubmitField('Login')
+
 
 #Create the database tables
 with app.app_context():
