@@ -1,10 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, flash # type: ignore
+from flask import Flask, render_template, request, redirect, url_for, flash, send_file # type: ignore
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, EqualTo
 from werkzeug.security import generate_password_hash, check_password_hash
+import pandas as pd
+from io import BytesIO
 
 app = Flask(__name__)
 
@@ -28,6 +30,19 @@ class User(UserMixin, db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+#Define the RegistrationForm class
+class RegistrationForm(FlaskForm):
+    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=20)])
+    password = PasswordField('Password', validators=[InputRequired(), Length(min=4, max=20)])
+    confirm = PasswordField('Confirm Password', validators=[InputRequired(), Length(min=4, max=20)])
+    submit = SubmitField('Register')
+
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=20)])
+    password = PasswordField('Password', validators=[InputRequired(), Length(min=4, max=20)])
+    submit = SubmitField('Login')
+
 
 # Define the Transaction model
 class Transaction(db.Model):
@@ -114,12 +129,27 @@ def delete_transaction(transaction_id):
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
+        # Debug print to check if form is validated
+        print('Form Validated')
+        
+        user_exists = User.query.filter_by(username=form.username.data).first()
+        if user_exists:
+            flash('Username already exists. Please choose a different one.', 'danger')
+            return redirect(url_for('register'))
+
         hashed_password = generate_password_hash(form.password.data)
         new_user = User(username=form.username.data, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
+        
+        print(f'User {form.username.data} registered successfully')
+        
         flash('Your account has been created!', 'success')
         return redirect(url_for('login'))
+    
+    # Debug print to check if form validation failed    
+    print('Form not validated')
+    print(form.errors)
     return render_template('register.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -143,7 +173,6 @@ def logout():
 # transactions = []
 # initial_balance = 0.0
 # balance = initial_balance
-
 
 
 # def home():
@@ -178,16 +207,33 @@ def set_initial_balance():
     db.session.commit()
     return redirect(url_for('home'))
 
-class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=20)])
-    password = PasswordField('Password', validators=[InputRequired(), Length(min=4, max=20)])
-    confirm = PasswordField('Confirm Password', validators=[InputRequired(), Length(min=4, max=20)])
-    submit = SubmitField('Register')
-
-class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[InputRequired(), Length(min=4, max=20)])
-    password = PasswordField('Password', validators=[InputRequired(), Length(min=4, max=20)])
-    submit = SubmitField('Login')
+@app.route('/export/<file_type>')
+@login_required
+def export(file_type):
+    transactions = Transaction.query.all()
+    data = [{
+        'Date': transaction.date,
+        'Description': transaction.description,
+        'Amount': transaction.amount,
+        'Type': transaction.type
+    }for transaction in transactions]
+    
+    df = pd.DataFrame(data)
+    
+    if file_type == 'csv':
+        output = BytesIO()
+        df.to_csv(output, index=False)
+        output.seek(0)
+        return send_file(output, mimetype='text/csv', as_attachment=True, download_name='transactions.csv')
+    elif file_type == 'excel':
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+            df.to_excel(writer, index=False, sheet_name='Transactions')
+        output.seek(0)
+        return send_file(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', as_attachment=True, download_name='transactions.xlsx')
+    else:
+        flash('Invalid file type requested.', 'danger')
+        return redirect(url_for('home'))
 
 
 #Create the database tables

@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cash Flow Tracker</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- set the css style for userinfo on top right corner, and fade-out effect -->
     <style>
-        .user-info {
+        .user-info{
             position: absolute;
             top: 10px;
             right: 10px;
@@ -15,18 +16,11 @@
             opacity: 1;
             transition: opacity 1s ease-out;
         }
-        .hidden {
+        .hidden{
             opacity: 0;
         }
-        .dragging {
+        .dragging{
             opacity: 0.5;
-            background-color: #f0f0f0;
-        }
-        .drag-over{
-            border: 2px dashed #007bff;
-        }
-        .table-row{
-            transition: all 0.2s ease;
         }
     </style>
 </head>
@@ -37,14 +31,13 @@
             <p>Status: {{ status }}</p>
             <a href="{{ url_for('logout') }}">Logout</a>
         </div>
-        <h2>Cash Flow Tracker</h2>
 
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                <div class="mt-3" id="flash-messages">
+                <div class="mt-3">
                     {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} fade-out" role="alert">
+                        <div id="flash-message" class="alert alert-{{ category }} fade-out" role="alert">
                             {{ message }}
                         </div>
                     {% endfor %}
@@ -52,6 +45,7 @@
             {% endif %}
         {% endwith %}
 
+        <h2>Cash Flow Tracker</h2>
         <!-- Form to set the initial balance -->
         <form method="POST" action="/set-initial-balance">
             <div class="mb-3">
@@ -61,6 +55,8 @@
             <button type="submit" class="btn btn-secondary">Set Initial Balance</button>
         </form>
         <hr>
+
+        <!-- Form to set the transaction details -->
         <form method="POST">
             <div class="mb-3">
                 <label for="date" class="form-label">Date</label>
@@ -88,26 +84,25 @@
         <h3>Initial Balance: ${{ initial_balance }}</h3>
         <h3>Current Balance: ${{ balance }}</h3>
 
-        <table class="table" id="transactionTable">
+        <table class="table">
             <thead>
                 <tr>
                     <th scope="col">Date</th>
                     <th scope="col">Description</th>
                     <th scope="col">Amount</th>
                     <th scope="col">Type</th>
-                    <th scope="col">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for transaction in transactions %}
-                <tr class='table-row' draggable="true">
+                <tr draggable="true">
                     <td>{{ transaction.date }}</td>
                     <td>{{ transaction.description }}</td>
                     <td>{{ transaction.amount }}</td>
                     <td>{{ transaction.type }}</td>
                     <td>
                         <a href="{{ url_for('edit_transaction', transaction_id=transaction.id) }}" class="btn btn-primary">Edit</a>
-                        <form action="{{ url_for('delete_transaction', transaction_id=transaction.id) }}" method="POST" style="display:inline;">
+                        <form action="{{  url_for('delete_transaction', transaction_id=transaction.id)  }}" method="POST" style="display:inline;">
                             <button type="submit" class="btn btn-danger">Delete</button>
                         </form>
                     </td>
@@ -115,19 +110,15 @@
                 {% endfor %}
             </tbody>
         </table>
-
-        <!-- Export Buttons -->
-         <div class="mt3">
-            <a href="{{  url_for('export', file_type='csv')  }}" class="btn btn-success">Export as CSV</a>
-            <a href="{{  url_for('export', file_type='excel')  }}" class="btn btn-success">Export as Excel</a>
-         </div>
-
     </div>
+
+    <!-- JavaScript to auto-dismiss flash message after 3 seconds -->
     <script>
-        window.onload = function() {
-            setTimeout(function() {
+        // Gradully fade out the flash messge in JS
+        window.onload = function(){
+            setTimeout(function(){
                 var flashMessages = document.querySelectorAll('.alert');
-                flashMessages.forEach(function(message) {
+                flashMessages.forEach(function(message){
                     message.classList.add('hidden');
                 });
             }, 3000);
@@ -137,44 +128,26 @@
             const table = document.getElementById('transactionTable');
             let draggingRow = null;
 
-            table.addEventListener('dragstart', (e) => {
+            table.addEventListener('dragstart',(e) => {
                 draggingRow = e.target.closest('tr');
                 draggingRow.classList.add('dragging');
-                //e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.effectAllowed = 'move';
             });
 
-            
-
-            table.addEventListener('dragover', (e) => {
+            table.addEventListener('dragover',(e) => {
                 e.preventDefault();
                 const afterElement = getDragAfterElement(table, e.clientY);
-                const draggable = document.querySelector('.dragging');
-                if (afterElement == null) {
+                const draggable = document.querySelectorAll('.dragging');
+                if (afterElement == null){
                     table.querySelector('tbody').appendChild(draggable);
-                } else {
-                    table.querySelector('tbody').insertBefore(draggable, afterElement);
+                }else {
+                    table.querySelector('tbody').insertBefore(draggable,afterElement)
                 }
             });
 
-            table.addEventListener('dragenter', (e) => {
-                if (e.target.tagName === 'TR' && e.target !== draggingRow) {
-                    e.target.classList.add('drag-over');
-                }
-            });
-
-            table.addEventListener('dragleave', (e) => {
-                if (e.target.tagName === 'TR' && e.target !== draggingRow) {
-                    e.target.classList.remove('drag-over');
-                }
-            });
-
-            table.addEventListener('dragend', () => {
-                if(draggingRow){
-                    draggingRow.classList.remove('dragging');
-                    draggingRow = null;
-                    const rows = table.querySelectorAll('tr');
-                    rows.forEach(row => row.classList.remove('drag-over'));
-                }
+            table.addEventListener('dragged', () => {
+                draggingRow.classList.remove('dragging');
+                draggingRow = null;
             });
 
             function getDragAfterElement(table, y) {
@@ -183,8 +156,8 @@
                 return draggableElements.reduce((closest, child) => {
                     const box = child.getBoundingClientRect();
                     const offset = y - box.top - box.height / 2;
-                    if (offset < 0 && offset > closest.offset) {
-                        return { offset: offset, element: child };
+                    if (offset < 0 && offset > closest.offset){
+                        return { offset: offset,element:child};
                     } else {
                         return closest;
                     }
