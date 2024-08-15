@@ -96,10 +96,13 @@ def home():
     initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
     balance = initial_balance + sum(
         t.amount if t.type == 'Income' else -t.amount for t in transactions
-    )        
+    )
+    
+    total_income = sum(t.amount for t in transactions if t.type == 'Income')
+    total_expense = sum(t.amount for t in transactions if t.type == 'Expense')       
     
     return render_template('home.html', transactions=transactions, balance=balance, initial_balance=initial_balance,
-                           user=current_user,status=user_status)
+                           total_income=total_income, total_expense=total_expense, user=current_user,status=user_status)
 
 @app.route('/edit/<int:transaction_id>', methods=['GET','POST'])
 @login_required
