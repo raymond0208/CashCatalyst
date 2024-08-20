@@ -82,27 +82,25 @@ def home():
         db.session.commit()
         return redirect(url_for('home'))
     
-		# #Update balance
-        # if transaction['type'] == 'Income':
-        #     balance += transaction['amount']
-        # elif transaction['type'] == 'Expense':
-        #     balance -= transaction['amount']
-        
-        # return redirect(url_for('home'))
-        
-    # Retrieve all transactions and the initial balance
     transactions = Transaction.query.all()
     initial_balance_record = InitialBalance.query.first()
     initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
-    balance = initial_balance + sum(
-        t.amount if t.type == 'Income' else -t.amount for t in transactions
-    )
+
     
-    total_income = sum(t.amount for t in transactions if t.type == 'Income')
-    total_expense = sum(t.amount for t in transactions if t.type == 'Expense')       
+    # Calculations for CFO, CFI, and CFF
+    cfo_types = ["Cash-customer", "Salary-suppliers", "Interest-paid", "Income-tax", "Other-cfo"]
+    cfi_types = ["Buy-property-equipments", "Sell-property-equipments", "Buy-investment", "Sell-investment", "Other-cfi"]
+    cff_types = ["Issue-shares", "borrowings", "Repay-borrowings", "Pay-dividends", "Other-cff"]
+    
+    total_cfo = sum(t.amount for t in transactions if t.type in cfo_types)
+    total_cfi = sum(t.amount for t in transactions if t.type in cfi_types)
+    total_cff = sum(t.amount for t in transactions if t.type in cff_types)
+    
+    # Calculate balance
+    balance = initial_balance + total_cfo + total_cfi + total_cff
     
     return render_template('home.html', transactions=transactions, balance=balance, initial_balance=initial_balance,
-                           total_income=total_income, total_expense=total_expense, user=current_user,status=user_status)
+                           total_cfo=total_cfo, total_cfi=total_cfi, total_cff=total_cff, user=current_user,status=user_status)
 
 @app.route('/edit/<int:transaction_id>', methods=['GET','POST'])
 @login_required

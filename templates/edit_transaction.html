@@ -35,8 +35,27 @@
         <div class="mb-3">
             <label for="type">Type:</label>
             <select id="type" name="type">
-            <option value="Income" {% if transaction.type == 'Income' %}selected{% endif %}>Income</option>
-            <option value="Expense" {% if transaction.type == 'Expense' %}selected{% endif %}>Expense</option>
+                <optgroup label="Cashflow from operation">
+                    <option value="Cash-customer">Cash from customers</option>
+                    <option value="Salary-suppliers">Salary & Supplier payments</option>
+                    <option value="Interest-paid">Interest paid</option>
+                    <option value="Income-tax">Income taxes</option>
+                    <option value="Other-cfo">Other operating cashflow</option>
+                </optgroup>
+                <optgroup label="Cashflow from investment">
+                    <option value="Buy-property-equipments">Purchase of property&equipments</option>
+                    <option value="Sell-property-equipments">Sell of property&equipments</option>
+                    <option value="Buy-investment">Purchase of investments</option>
+                    <option value="Sell-investment">Sale of investments</option>
+                    <option value="Other-cfi">Other investing cashflow</option>
+                </optgroup>
+                <optgroup label="Cashflow from financing">
+                    <option value="Issue-shares">Issuing shares</option>
+                    <option value="borrowings">Borrowings</option>
+                    <option value="Repay-borrowings">Repayment of borrowings</option>
+                    <option value="Pay-dividends">Dividends paid</option>
+                    <option value="Other-cff">Other financing cashflow</option>
+                </optgroup>
         </select>
         </div>
         <div clas="btn-container">

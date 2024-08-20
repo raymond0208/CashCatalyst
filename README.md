@@ -1,5 +1,38 @@
 # Cashflow Tracker
 
+## Version 1.1 - Release Date Aug 20 2024
+**Feature update**
+1. Update income/expense with more types following financial concepts in cashflow
+2. Calculate cashflow from operation(CFO),cashflow from investing(CFI) and cashflow from financing(CFF)
+3. Calculate real cashfow from cashflow reporting perspective within the given period
+4. Reframe the UI to make it more understandable
+
+**Breakdown of cashflow types**
+**Cash flows from operating activities**
+* Cash receipts from customers - Add
+* Cash payments to suppliers and employees - Minus
+* Interest paid - Minus
+* Income taxes paid - Minus
+* Other operating cash flows - Add/Minus
+
+**Cash flows from investing activities**
+* Purchase of property, plant, and equipment - Minus
+* Proceeds from sale of property, plant, and equipment - Add
+* Purchase of investments - Minus
+* Proceeds from sale of investments - Add
+* Other investing cash flows - Add/Minus
+
+**Cash flows from financing activities**
+* Proceeds from issuing shares - Add
+* Proceeds from borrowings - Add
+* Repayment of borrowings - Minus
+* Dividends paid - Minus
+* Other financing cash flows - Add/Minus
+
+## New UI
+![alt text](UI-v1.1.png)
+
+## Version 1.0 - Release Date Aug 8 2024
 This cashflow tracker is a Python Flask based app help a fast team and business owner to quickly note down the cash-in/cash-out and make wise decisions based on the available cash. 
 
 The main features include:
