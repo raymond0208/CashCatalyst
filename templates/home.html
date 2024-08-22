@@ -183,7 +183,20 @@
         <div class="export-buttons-section">
             <a href="{{  url_for('export', file_type='csv')  }}" class="btn btn-success">Export as CSV</a>
             <a href="{{  url_for('export', file_type='excel')  }}" class="btn btn-success">Export as Excel</a>
+        </div>
+
+
+        <form method="POST" action="{{ url_for('balance_by_date') }}">
+            <div class="mb-3">
+                <label for="date" class="form-label">Calculate Balance Until</label>
+                <input type="date" class="form-control" id="date" name="date" required>
             </div>
+            <button type="submit" class="btn btn-primary">Calculate</button>
+        </form>
+        <div class="balance-section">
+            <h3>Calculated Balance as of {{ date }}: ${{ balance_sum }}</h3>
+        </div>
+
 
         <!-- Display Balance and amount -->
         <div class="balance-section">

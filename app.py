@@ -65,6 +65,19 @@ def index():
         return redirect(url_for('login'))
     return redirect(url_for('home'))
 
+@app.route('/balance-by-date', methods=['POST'])
+@login_required
+def balance_by_date():
+    input_date = request.form.get('date')
+    
+    transactions = Transaction.query.filter(Transaction.date <= input_date).all()
+    initial_balance_record = InitialBalance.query.first()
+    initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
+    
+    balance_sum = sum(t.amount for t in transactions)
+    
+    return render_template('home.html',transactions=transactions,initial_balance=initial_balance,balance_sum=balance_sum,date=input_date)
+
 @app.route('/home', methods = ['GET','POST'])
 @login_required
 def home():
@@ -170,29 +183,6 @@ def logout():
     logout_user()
     return redirect(url_for('login'))    
 
-#Below is the list to store data before database opiton used
-# transactions = []
-# initial_balance = 0.0
-# balance = initial_balance
-
-
-# def home():
-#     global balance
-#     if request.method == 'POST':
-#         transaction = {
-# 		'date': request.form.get('date'),
-# 		'description': request.form.get('description'),
-# 		'amount': float(request.form.get('amount')),
-# 		'type': request.form.get('type'),
-# 		}
-#         transactions.append(transaction)
-
-#@app.route('/set-initial-balance',methods=['POST'])
-# def set_initial_balance():
-#     global initial_balance,balance
-#     initial_balance = float(request.form.get('initial_balance'))
-#     balance = initial_balance
-#     return redirect(url_for('home'))
 @app.route('/set-initial-balance', methods=['POST'])
 def set_initial_balance():
     initial_balance_value = float(request.form.get('initial_balance'))
