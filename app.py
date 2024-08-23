@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, send_file # type: ignore
+from flask import Flask, render_template, request, redirect, url_for, flash, send_file, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -232,8 +232,11 @@ def balance_by_date():
 
     balance_sum = initial_balance + total_cfo + total_cfi + total_cff
     
-    return render_template('home.html',balance_sum=balance_sum,date=input_date,total_cfo=total_cfo,total_cfi = total_cfi, total_cff=total_cff, user=current_user)
-
+    #return render_template('home.html',balance_sum=balance_sum,date=input_date,total_cfo=total_cfo,total_cfi = total_cfi, total_cff=total_cff, user=current_user)
+    return jsonify({
+        'input_date': input_date,
+        'balance_sum': balance_sum
+    })
 
 #Create the database tables
 with app.app_context():

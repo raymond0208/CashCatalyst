@@ -64,6 +64,21 @@
         .table-row{
             transition: all 0.2s ease;
         }
+        .nav-tabs .nav-link {
+            color: #495057;
+        }
+        .nav-tabs .nav-link.active {
+            font-weight: bold;
+        }
+        .tab-content {
+            padding-top: 20px;
+        }
+        .tab-pane {
+            display: none;
+        }
+        .tab-pane-show-active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -87,6 +102,76 @@
                 </div>
             {% endif %}
         {% endwith %}
+
+        <!-- Tabs for balance information -->
+        <ul class="nav nav-tabs" id="balanceTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="total-balance-tab" data-bs-toggle="tab" data-bs-target="#total-balance" type="button" role="tab" aria-controls="total-balance" aria-selected="true">Total Balance</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="balance-by-date-tab" data-bs-toggle="tab" data-bs-target="#balance-by-date" type="button" role="tab" aria-controls="balance-by-date" aria-selected="false">Balance by Date</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="balanceTabContent">
+            <!-- Total Balance Tab -->
+            <div class="tab-pane fade show active" id="total-balance" role="tabpanel" aria-labelledby="total-balance-tab">
+                <div class="balance-section mt-4">
+                    <h3>Cash Flow Overview</h3>
+                    <div class="row">
+                        <div class="col">
+                            <div class="balance-item">
+                                <h4>Initial Cash Balance</h4>
+                                <p>${{ initial_balance }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="balance-item">
+                                <h4>CFO (Cashflow from Operation)</h4>
+                                <p>${{ total_cfo }}</p>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="balance-item">
+                                <h4>CFI (Cashflow from Investment)</h4>
+                                <p>${{ total_cfi }}</p>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="balance-item">
+                                <h4>CFF (Cashflow from Financing)</h4>
+                                <p>${{ total_cff }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="balance-item">
+                                <h4>Latest Cash Balance</h4>
+                                <p>${{ balance }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Balance by Date Tab -->
+            <div class="tab-pane fade" id="balance-by-date" role="tabpanel" aria-labelledby="balance-by-date-tab">
+                <div class="balance-section mt-4">
+                    <h3>Balance by Date</h3>
+                    <form id="balance-by-date-form">
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Calculate Balance Until</label>
+                            <input type="date" class="form-control" id="date" name="date" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Calculate</button>
+                    </form>
+                    <div id="balance-by-date-result" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
 
         <!-- Form to set the initial balance -->
         <div class="initial-balance-section">
@@ -184,69 +269,6 @@
             <a href="{{  url_for('export', file_type='csv')  }}" class="btn btn-success">Export as CSV</a>
             <a href="{{  url_for('export', file_type='excel')  }}" class="btn btn-success">Export as Excel</a>
         </div>
-
-
-        <form method="POST" action="{{ url_for('balance_by_date') }}">
-            <div class="mb-3">
-                <label for="date" class="form-label">Calculate Balance Until</label>
-                <input type="date" class="form-control" id="date" name="date" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Calculate</button>
-        </form>
-        <div class="balance-section">
-            {% if balance_sum %}
-                <h3>Balance up to {{ date }}: {{ balance_sum }}</h3>
-            {% else %}
-                <p>Balance up to date</p>
-            {% endif %}
-        </div>
-
-
-        <!-- Display Balance and amount -->
-        <div class="balance-section">
-            <h3>Cash Flow Overview</h3>
-            <br>
-            <!-- Row 1: Initial Cash Balance -->
-            <div class="row">
-                <div class="col">
-                    <div class="balance-item">
-                        <h4>Initial Cash Balance</h4>
-                        <p>${{ initial_balance }}</p>
-                    </div>
-                </div>
-            </div>
-            <!-- Row 2: CFO, CFI, CFF -->
-            <div class="row">
-                <div class="col">
-                    <div class="balance-item">
-                        <h4>CFO (Cashflow from Operation)</h4>
-                        <p class="cfo-amount">${{ total_cfo }}</p>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="balance-item">
-                        <h4>CFI (Cashflow from Investment)</h4>
-                        <p>${{ total_cfi }}</p>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="balance-item">
-                        <h4>CFF (Cashflow from Financing)</h4>
-                        <p>${{ total_cff }}</p>
-                    </div>
-                </div>
-            </div>
-            <!-- Row 3: Latest Cash Balance -->
-            <div class="row">
-                <div class="col">
-                    <div class="balance-item">
-                        <h4>Latest Cash Balance</h4>
-                        <p>${{ balance }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>        
-
     </div>
 
     <script>
@@ -316,6 +338,61 @@
                     }
                 }, { offset: Number.NEGATIVE_INFINITY }).element;
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all tab buttons and content
+            const tabs = document.querySelectorAll('.nav-link');
+            const tabContents = document.querySelectorAll('.tab-pane');
+
+            // Function to set active tab
+            function setActiveTab(clickedTab) {
+                // Remove active class from all tabs and contents
+                tabs.forEach(tab => tab.classList.remove('active'));
+                tabContents.forEach(content => {
+                    content.classList.remove('show', 'active');
+                });
+
+                // Add active class to clicked tab and its content
+                clickedTab.classList.add('active');
+                const contentId = clickedTab.getAttribute('data-bs-target').slice(1);
+                const activeContent = document.getElementById(contentId);
+                activeContent.classList.add('show', 'active');
+            }
+
+            // Add click event listeners to tabs
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    setActiveTab(this);
+                });
+            });
+
+            //Handle balance-by-date form submission
+            const balanceByDateForm = document.getElementById('balance-by-date-form');
+            const balanceByDateResult = document.getElementById('balance-by-date-result');
+
+            balanceByDateForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+
+                fetch('{{ url_for("balance_by_date") }}', {
+                    method:'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    balanceByDateResult.innerHTML = `
+                        <h4>Balance up to ${data.input_date}</h4>
+                        <p>$${data.balance_sum.toFixed(2)}</p>
+                        `;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    balanceByDateResult.innerHTML = '<p>An error occurred. Please try again.</p>';
+                });
+            });
         });
     </script>
 
