@@ -56,6 +56,19 @@ class Transaction(db.Model):
 class InitialBalance(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     balance = db.Column(db.Float, nullable=False)
+    
+    
+# Helper function for balance calculation
+def calculate_totals(transactions):
+    cfo_types = ["Cash-customer", "Salary-suppliers", "Interest-paid", "Income-tax", "Other-cfo"]
+    cfi_types = ["Buy-property-equipments", "Sell-property-equipments", "Buy-investment", "Sell-investment", "Other-cfi"]
+    cff_types = ["Issue-shares", "borrowings", "Repay-borrowings", "Pay-dividends", "Other-cff"]
+
+    total_cfo = sum(t.amount for t in transactions if t.type in cfo_types)
+    total_cfi = sum(t.amount for t in transactions if t.type in cfi_types)
+    total_cff = sum(t.amount for t in transactions if t.type in cff_types)
+    
+    return total_cfo, total_cfi, total_cff
 
 # Routes
 
@@ -64,19 +77,6 @@ def index():
     if not current_user.is_authenticated:
         return redirect(url_for('login'))
     return redirect(url_for('home'))
-
-@app.route('/balance-by-date', methods=['POST'])
-@login_required
-def balance_by_date():
-    input_date = request.form.get('date')
-    
-    transactions = Transaction.query.filter(Transaction.date <= input_date).all()
-    initial_balance_record = InitialBalance.query.first()
-    initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
-    
-    balance_sum = sum(t.amount for t in transactions)
-    
-    return render_template('home.html',transactions=transactions,initial_balance=initial_balance,balance_sum=balance_sum,date=input_date)
 
 @app.route('/home', methods = ['GET','POST'])
 @login_required
@@ -100,14 +100,7 @@ def home():
     initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
 
     
-    # Calculations for CFO, CFI, and CFF
-    cfo_types = ["Cash-customer", "Salary-suppliers", "Interest-paid", "Income-tax", "Other-cfo"]
-    cfi_types = ["Buy-property-equipments", "Sell-property-equipments", "Buy-investment", "Sell-investment", "Other-cfi"]
-    cff_types = ["Issue-shares", "borrowings", "Repay-borrowings", "Pay-dividends", "Other-cff"]
-    
-    total_cfo = sum(t.amount for t in transactions if t.type in cfo_types)
-    total_cfi = sum(t.amount for t in transactions if t.type in cfi_types)
-    total_cff = sum(t.amount for t in transactions if t.type in cff_types)
+    total_cfo, total_cfi, total_cff = calculate_totals(transactions)
     
     # Calculate balance
     balance = initial_balance + total_cfo + total_cfi + total_cff
@@ -225,6 +218,21 @@ def export(file_type):
     else:
         flash('Invalid file type requested.', 'danger')
         return redirect(url_for('home'))
+
+@app.route('/balance-by-date', methods=['POST'])
+@login_required
+def balance_by_date():
+    input_date = request.form.get('date')
+    
+    transactions = Transaction.query.filter(Transaction.date <= input_date).all()
+    initial_balance_record = InitialBalance.query.first()
+    initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
+    
+    total_cfo, total_cfi, total_cff = calculate_totals(transactions)
+
+    balance_sum = initial_balance + total_cfo + total_cfi + total_cff
+    
+    return render_template('home.html',balance_sum=balance_sum,date=input_date,total_cfo=total_cfo,total_cfi = total_cfi, total_cff=total_cff, user=current_user)
 
 
 #Create the database tables

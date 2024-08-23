@@ -194,7 +194,11 @@
             <button type="submit" class="btn btn-primary">Calculate</button>
         </form>
         <div class="balance-section">
-            <h3>Calculated Balance as of {{ date }}: ${{ balance_sum }}</h3>
+            {% if balance_sum %}
+                <h3>Balance up to {{ date }}: {{ balance_sum }}</h3>
+            {% else %}
+                <p>Balance up to date</p>
+            {% endif %}
         </div>
 
 
