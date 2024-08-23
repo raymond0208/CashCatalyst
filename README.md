@@ -1,5 +1,11 @@
 # Cashflow Tracker
 
+## Version 1.1.1-rc1 - Release Date 23 2024
+**Feature update**
+1. Move the CFO/CFI/CFF and balance overview to top for better visibility
+2. Add a switch tab on top for cash flow balance of any specific date
+
+
 ## Version 1.1 - Release Date Aug 20 2024
 **Feature update**
 1. Update income/expense with more types following financial concepts in cashflow
