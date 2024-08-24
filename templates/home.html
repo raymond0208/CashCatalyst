@@ -267,44 +267,25 @@
     <!-- Pagination Controls -->
     <nav aria-label="Page navigation">
         <ul class="pagination">
-            {% if transactions.has_prev %}
-            <li class="page-item">
-                <a class="page-link" href="{{ url_for('home', page=transactions.prev_num) }}" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-            {% else %}
-            <li class="page-item disabled">
-                <span class="page-link">&laquo;</span>
-            </li>
-            {% endif %}
-
-            {% for page_num in transactions.iter_pages() %}
-            {% if page_num %}
-            {% if page_num == transactions.page %}
-            <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
-            {% else %}
-            <li class="page-item"><a class="page-link" href="{{ url_for('home', page=page_num) }}">{{ page_num }}</a></li>
-            {% endif %}
-            {% else %}
-            <li class="page-item disabled"><span class="page-link">…</span></li>
-            {% endif %}
+            {% for page_num in transactions.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                {% if page_num %}
+                    {% if transactions.page == page_num %}
+                        <li class="page-item active">
+                            <a class="page-link" href="{{ url_for('home', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('home', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                    {% endif %}
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                {% endif %}
             {% endfor %}
-
-            {% if transactions.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="{{ url_for('home', page=transactions.next_num) }}" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>
-            {% else %}
-            <li class="page-item disabled">
-                <span class="page-link">&raquo;</span>
-            </li>
-            {% endif %}
         </ul>
     </nav>
-</div>
 
         <!-- Export Buttons -->
         <div class="export-buttons-section">

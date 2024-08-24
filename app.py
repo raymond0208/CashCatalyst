@@ -98,17 +98,20 @@ def home():
         db.session.commit()
         return redirect(url_for('home'))
     
-    transactions = Transaction.query.paginate(page=page, per_page=per_page)
+    paginated_transactions = Transaction.query.order_by(Transaction.date.desc()).paginate(page=page, per_page=per_page)
+    
+    all_transactions = Transaction.query.all()
+    
     initial_balance_record = InitialBalance.query.first()
     initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
 
     
-    total_cfo, total_cfi, total_cff = calculate_totals(transactions)
+    total_cfo, total_cfi, total_cff = calculate_totals(all_transactions)
     
     # Calculate balance
     balance = initial_balance + total_cfo + total_cfi + total_cff
     
-    return render_template('home.html', transactions=transactions, balance=balance, initial_balance=initial_balance,
+    return render_template('home.html', transactions=paginated_transactions, balance=balance, initial_balance=initial_balance,
                            total_cfo=total_cfo, total_cfi=total_cfi, total_cff=total_cff, user=current_user,status=user_status)
 
 @app.route('/edit/<int:transaction_id>', methods=['GET','POST'])
