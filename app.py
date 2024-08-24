@@ -83,6 +83,9 @@ def index():
 def home():
     user_status = "Logged In"
     
+    page = request.args.get('page', 1, type=int)
+    per_page = 8
+    
     if request.method == 'POST':
         # Handle adding transactions
         transaction = Transaction(
@@ -95,7 +98,7 @@ def home():
         db.session.commit()
         return redirect(url_for('home'))
     
-    transactions = Transaction.query.all()
+    transactions = Transaction.query.paginate(page=page, per_page=per_page)
     initial_balance_record = InitialBalance.query.first()
     initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
 
