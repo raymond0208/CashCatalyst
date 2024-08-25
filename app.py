@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+import os
 from flask import Flask, render_template, request, redirect, url_for, flash, send_file, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -7,6 +9,10 @@ from wtforms.validators import InputRequired, Length, EqualTo
 from werkzeug.security import generate_password_hash, check_password_hash
 import pandas as pd
 from io import BytesIO
+from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT
+
+load_dotenv()
+anthropic = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
 app = Flask(__name__)
 
@@ -243,7 +249,55 @@ def balance_by_date():
         'input_date': input_date,
         'balance_sum': balance_sum
     })
-
+    
+@app.route('/forecast', methods=['GET'])
+@login_required
+def forecast():
+    transactions = Transaction.query.order_by(Transaction.date).all()
+    initial_balance_record = InitialBalance.query.first()
+    initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
+    
+    total_cfo, total_cfi, total_cff = calculate_totals(transactions)
+    current_balance = initial_balance + total_cfo + total_cfi + total_cff
+    
+    #Data prepration for Claude AI
+    transaction_data = "\n".join([f"Date: {t.date}, Amount: {t.amount}, Type: {t.type}" for t in transactions])
+    
+    #Create prompt for Claude
+    prompt = f"As a financial analyst, please provide a comprehensive analysis of the following financial data:\n\n"
+    prompt += f"Initial Balance: ${initial_balance}\n"
+    prompt += f"Current Balance: ${current_balance}\n"
+    prompt += f"Total CFO: ${total_cfo}\n"
+    prompt += f"Total CFI: ${total_cfi}\n"
+    prompt += f"Total CFF: ${total_cff}\n"
+    prompt += f"Transaction Data:\n"
+    prompt += transaction_data
+    prompt += "\n\nPlease provide the following:\n"
+    prompt += "1. A summary of the current financial position\n"
+    prompt += "2. An analysis of financial health based on CFO, CFI, and CFF, including potential risks and opportunities\n"
+    prompt += "3. A forecast for CFO, CFI, and CFF for the next 30, 60, and 90 days, including potential scenarios\n"
+    prompt += "4. Projected total balances based on these forecasts\n"
+    prompt += "5. Strategic recommendations and insights based on this data, including potential areas for improvement or investment\n"
+    prompt += f"{AI_PROMPT}"
+    
+    #Make API call to Claude
+    client = Anthropic()
+    
+    try:
+        message = client.messages.create(
+            model="claude-3-sonnet-20240229",
+            max_tokens=1000,
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
+        analysis = message.content[0].text
+    except Exception as e:
+        print(f"Error calling Anthropic API: {str(e)}")
+        return jsonify({'error':'Failed to generate analysis'}),500
+    
+    return jsonify({'analysis': analysis}) #Return the result in JSON format
+    
 #Create the database tables
 with app.app_context():
     db.create_all()

@@ -111,8 +111,11 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="balance-by-date-tab" data-bs-toggle="tab" data-bs-target="#balance-by-date" type="button" role="tab" aria-controls="balance-by-date" aria-selected="false">Balance by Date</button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="anthropic-analysis-tab" data-bs-toggle="tab" data-bs-target="#anthropic-analysis" type="button" role="tab" aria-controls="anthropic-analysis" aria-selected="false">Anthropic Analysis</button>
+            </li>            
         </ul>
-
+        <!-- Tab content area -->
         <div class="tab-content" id="balanceTabContent">
             <!-- Total Balance Tab -->
             <div class="tab-pane fade show active" id="total-balance" role="tabpanel" aria-labelledby="total-balance-tab">
@@ -169,6 +172,18 @@
                         <button type="submit" class="btn btn-primary">Calculate</button>
                     </form>
                     <div id="balance-by-date-result" class="mt-3"></div>
+                </div>
+            </div>
+
+            <!-- AI Analysis Tab -->
+            <div class="tab-pane fade" id="anthropic-analysis" role="tabpanel" aria-labelledby="anthropic-analysis-tab">
+                <div class="balance-section mt-4">
+                    <h3>Anthropic Financial Analysis</h3>
+                    <div id="analysis-content">
+                        <p>Click the button below to generate the analysis.</p>
+                        <button id="generate-analysis" class="btn btn-primary">Generate Analysis</button>
+                    </div>
+                    <div id="loading" style="display: none;">Loading analysis...</div>
                 </div>
             </div>
         </div>
@@ -416,8 +431,28 @@
                     balanceByDateResult.innerHTML = '<p>An error occurred. Please try again.</p>';
                 });
             });
+
+            const generateAnalysisBtn = document.getElementById('generate-analysis');
+            const analysisContent = document.getElementById('analysis-content');
+            const loadingIndicator = document.getElementById('loading');
+
+            generateAnalysisBtn.addEventListener('click', function() {
+                loadingIndicator.style.display = 'block';
+                analysisContent.innerHTML = '';
+
+                fetch('/forecast')
+                    .then(response => response.json())
+                    .then(data => {
+                        loadingIndicator.style.display = 'none';
+                        analysisContent.innerHTML = `<pre>${data.analysis}</pre>`;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        loadingIndicator.style.display = 'none';
+                        analysisContent.innerHTML = '<p>An error occurred while generating the analysis. Please try again.</p>';
+                    });
+            });
         });
     </script>
-
 </body>
 </html>
