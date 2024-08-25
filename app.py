@@ -1,4 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, send_file # type: ignore
+from dotenv import load_dotenv
+import os
+from flask import Flask, render_template, request, redirect, url_for, flash, send_file, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -7,6 +9,10 @@ from wtforms.validators import InputRequired, Length, EqualTo
 from werkzeug.security import generate_password_hash, check_password_hash
 import pandas as pd
 from io import BytesIO
+from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT
+
+load_dotenv()
+anthropic = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
 app = Flask(__name__)
 
@@ -56,6 +62,19 @@ class Transaction(db.Model):
 class InitialBalance(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     balance = db.Column(db.Float, nullable=False)
+    
+    
+# Helper function for balance calculation
+def calculate_totals(transactions):
+    cfo_types = ["Cash-customer", "Salary-suppliers", "Interest-paid", "Income-tax", "Other-cfo"]
+    cfi_types = ["Buy-property-equipments", "Sell-property-equipments", "Buy-investment", "Sell-investment", "Other-cfi"]
+    cff_types = ["Issue-shares", "borrowings", "Repay-borrowings", "Pay-dividends", "Other-cff"]
+
+    total_cfo = sum(t.amount for t in transactions if t.type in cfo_types)
+    total_cfi = sum(t.amount for t in transactions if t.type in cfi_types)
+    total_cff = sum(t.amount for t in transactions if t.type in cff_types)
+    
+    return total_cfo, total_cfi, total_cff
 
 # Routes
 
@@ -70,6 +89,9 @@ def index():
 def home():
     user_status = "Logged In"
     
+    page = request.args.get('page', 1, type=int)
+    per_page = 8
+    
     if request.method == 'POST':
         # Handle adding transactions
         transaction = Transaction(
@@ -82,24 +104,20 @@ def home():
         db.session.commit()
         return redirect(url_for('home'))
     
-    transactions = Transaction.query.all()
+    paginated_transactions = Transaction.query.order_by(Transaction.date.desc()).paginate(page=page, per_page=per_page)
+    
+    all_transactions = Transaction.query.all()
+    
     initial_balance_record = InitialBalance.query.first()
     initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
 
     
-    # Calculations for CFO, CFI, and CFF
-    cfo_types = ["Cash-customer", "Salary-suppliers", "Interest-paid", "Income-tax", "Other-cfo"]
-    cfi_types = ["Buy-property-equipments", "Sell-property-equipments", "Buy-investment", "Sell-investment", "Other-cfi"]
-    cff_types = ["Issue-shares", "borrowings", "Repay-borrowings", "Pay-dividends", "Other-cff"]
-    
-    total_cfo = sum(t.amount for t in transactions if t.type in cfo_types)
-    total_cfi = sum(t.amount for t in transactions if t.type in cfi_types)
-    total_cff = sum(t.amount for t in transactions if t.type in cff_types)
+    total_cfo, total_cfi, total_cff = calculate_totals(all_transactions)
     
     # Calculate balance
     balance = initial_balance + total_cfo + total_cfi + total_cff
     
-    return render_template('home.html', transactions=transactions, balance=balance, initial_balance=initial_balance,
+    return render_template('home.html', transactions=paginated_transactions, balance=balance, initial_balance=initial_balance,
                            total_cfo=total_cfo, total_cfi=total_cfi, total_cff=total_cff, user=current_user,status=user_status)
 
 @app.route('/edit/<int:transaction_id>', methods=['GET','POST'])
@@ -170,29 +188,6 @@ def logout():
     logout_user()
     return redirect(url_for('login'))    
 
-#Below is the list to store data before database opiton used
-# transactions = []
-# initial_balance = 0.0
-# balance = initial_balance
-
-
-# def home():
-#     global balance
-#     if request.method == 'POST':
-#         transaction = {
-# 		'date': request.form.get('date'),
-# 		'description': request.form.get('description'),
-# 		'amount': float(request.form.get('amount')),
-# 		'type': request.form.get('type'),
-# 		}
-#         transactions.append(transaction)
-
-#@app.route('/set-initial-balance',methods=['POST'])
-# def set_initial_balance():
-#     global initial_balance,balance
-#     initial_balance = float(request.form.get('initial_balance'))
-#     balance = initial_balance
-#     return redirect(url_for('home'))
 @app.route('/set-initial-balance', methods=['POST'])
 def set_initial_balance():
     initial_balance_value = float(request.form.get('initial_balance'))
@@ -236,7 +231,76 @@ def export(file_type):
         flash('Invalid file type requested.', 'danger')
         return redirect(url_for('home'))
 
+@app.route('/balance-by-date', methods=['POST'])
+@login_required
+def balance_by_date():
+    input_date = request.form.get('date')
+    
+    transactions = Transaction.query.filter(Transaction.date <= input_date).all()
+    initial_balance_record = InitialBalance.query.first()
+    initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
+    
+    total_cfo, total_cfi, total_cff = calculate_totals(transactions)
 
+    balance_sum = initial_balance + total_cfo + total_cfi + total_cff
+    
+    #return render_template('home.html',balance_sum=balance_sum,date=input_date,total_cfo=total_cfo,total_cfi = total_cfi, total_cff=total_cff, user=current_user)
+    return jsonify({
+        'input_date': input_date,
+        'balance_sum': balance_sum
+    })
+    
+@app.route('/forecast', methods=['GET'])
+@login_required
+def forecast():
+    transactions = Transaction.query.order_by(Transaction.date).all()
+    initial_balance_record = InitialBalance.query.first()
+    initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
+    
+    total_cfo, total_cfi, total_cff = calculate_totals(transactions)
+    current_balance = initial_balance + total_cfo + total_cfi + total_cff
+    
+    #Data prepration for Claude AI
+    transaction_data = "\n".join([f"Date: {t.date}, Amount: {t.amount}, Type: {t.type}" for t in transactions])
+    
+    #Create prompt for Claude
+    prompt = f"""As a financial analyst, provide a concise analysis of the following financial data:
+
+    Initial Balance: ${initial_balance}
+    Current Balance: ${current_balance}
+    Total CFO: ${total_cfo}
+    Total CFI: ${total_cfi}
+    Total CFF: ${total_cff}
+
+    Transaction Data:
+    {transaction_data}
+
+    Please provide a brief, bullet-point analysis covering:
+    - Financial health analysis based on CFO, CFI, and CFF (2-3 points)
+    - 30, 60, and 90-day forecast for CFO, CFI, and CFF (compact table format)
+    - Projected total balances (compact table format)
+    - Key recommendations (2-3 points)
+
+    Limit each bullet point to 20 words or less. Use compact tables where applicable."""
+    
+    #Make API call to Claude
+    client = Anthropic()
+    
+    try:
+        message = client.messages.create(
+            model="claude-3-sonnet-20240229",
+            max_tokens=1000,
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
+        analysis = message.content[0].text
+    except Exception as e:
+        print(f"Error calling Anthropic API: {str(e)}")
+        return jsonify({'error':'Failed to generate analysis'}),500
+    
+    return jsonify({'analysis': analysis}) #Return the result in JSON format
+    
 #Create the database tables
 with app.app_context():
     db.create_all()
