@@ -65,9 +65,12 @@
             transition: all 0.2s ease;
         }
         .nav-tabs .nav-link {
+            font-size: 20px;
+            padding: 10px 20px;
             color: #495057;
         }
         .nav-tabs .nav-link.active {
+            font-size: 20px;
             font-weight: bold;
         }
         .tab-content {
@@ -78,6 +81,15 @@
         }
         .tab-pane-show-active {
             display: block;
+        }
+        .analysis-text {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            max-width: 100%;
+            overflow-x: auto;
         }
     </style>
 </head>
@@ -109,10 +121,10 @@
                 <button class="nav-link active" id="total-balance-tab" data-bs-toggle="tab" data-bs-target="#total-balance" type="button" role="tab" aria-controls="total-balance" aria-selected="true">Total Balance</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="balance-by-date-tab" data-bs-toggle="tab" data-bs-target="#balance-by-date" type="button" role="tab" aria-controls="balance-by-date" aria-selected="false">Balance by Date</button>
+                <button class="nav-link" id="balance-by-date-tab" data-bs-toggle="tab" data-bs-target="#balance-by-date" type="button" role="tab" aria-controls="balance-by-date" aria-selected="false">Check Balance by Date</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="anthropic-analysis-tab" data-bs-toggle="tab" data-bs-target="#anthropic-analysis" type="button" role="tab" aria-controls="anthropic-analysis" aria-selected="false">Anthropic Analysis</button>
+                <button class="nav-link" id="anthropic-analysis-tab" data-bs-toggle="tab" data-bs-target="#anthropic-analysis" type="button" role="tab" aria-controls="anthropic-analysis" aria-selected="false">AI Analysis</button>
             </li>            
         </ul>
         <!-- Tab content area -->
@@ -166,7 +178,6 @@
                     <h3>Balance by Date</h3>
                     <form id="balance-by-date-form">
                         <div class="mb-3">
-                            <label for="date" class="form-label">Calculate Balance Until</label>
                             <input type="date" class="form-control" id="date" name="date" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Calculate</button>
@@ -178,7 +189,7 @@
             <!-- AI Analysis Tab -->
             <div class="tab-pane fade" id="anthropic-analysis" role="tabpanel" aria-labelledby="anthropic-analysis-tab">
                 <div class="balance-section mt-4">
-                    <h3>Anthropic Financial Analysis</h3>
+                    <h3>AI Analysis</h3>
                     <div id="analysis-content">
                         <p>Click the button below to generate the analysis.</p>
                         <button id="generate-analysis" class="btn btn-primary">Generate Analysis</button>
@@ -191,7 +202,7 @@
         <!-- Form to set the initial balance -->
         <div class="initial-balance-section">
             <form method="POST" action="/set-initial-balance">
-              <h3>Calibrate cash balance</h3>
+              <h3>Set Initial Cash Balance</h3>
                 <div class="mb-3">
                     <input type="number" step="0.01" class="form-control" id="initial_balance" name="initial_balance" required>
                 </div>
@@ -444,7 +455,7 @@
                     .then(response => response.json())
                     .then(data => {
                         loadingIndicator.style.display = 'none';
-                        analysisContent.innerHTML = `<pre>${data.analysis}</pre>`;
+                        analysisContent.innerHTML = `<div class="analysis-text">${data.analysis}</div>`;
                     })
                     .catch(error => {
                         console.error('Error:', error);

@@ -264,21 +264,24 @@ def forecast():
     transaction_data = "\n".join([f"Date: {t.date}, Amount: {t.amount}, Type: {t.type}" for t in transactions])
     
     #Create prompt for Claude
-    prompt = f"As a financial analyst, please provide a comprehensive analysis of the following financial data:\n\n"
-    prompt += f"Initial Balance: ${initial_balance}\n"
-    prompt += f"Current Balance: ${current_balance}\n"
-    prompt += f"Total CFO: ${total_cfo}\n"
-    prompt += f"Total CFI: ${total_cfi}\n"
-    prompt += f"Total CFF: ${total_cff}\n"
-    prompt += f"Transaction Data:\n"
-    prompt += transaction_data
-    prompt += "\n\nPlease provide the following:\n"
-    prompt += "1. A summary of the current financial position\n"
-    prompt += "2. An analysis of financial health based on CFO, CFI, and CFF, including potential risks and opportunities\n"
-    prompt += "3. A forecast for CFO, CFI, and CFF for the next 30, 60, and 90 days, including potential scenarios\n"
-    prompt += "4. Projected total balances based on these forecasts\n"
-    prompt += "5. Strategic recommendations and insights based on this data, including potential areas for improvement or investment\n"
-    prompt += f"{AI_PROMPT}"
+    prompt = f"""As a financial analyst, provide a concise analysis of the following financial data:
+
+    Initial Balance: ${initial_balance}
+    Current Balance: ${current_balance}
+    Total CFO: ${total_cfo}
+    Total CFI: ${total_cfi}
+    Total CFF: ${total_cff}
+
+    Transaction Data:
+    {transaction_data}
+
+    Please provide a brief, bullet-point analysis covering:
+    - Financial health analysis based on CFO, CFI, and CFF (2-3 points)
+    - 30, 60, and 90-day forecast for CFO, CFI, and CFF (compact table format)
+    - Projected total balances (compact table format)
+    - Key recommendations (2-3 points)
+
+    Limit each bullet point to 20 words or less. Use compact tables where applicable."""
     
     #Make API call to Claude
     client = Anthropic()
