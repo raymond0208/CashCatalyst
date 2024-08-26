@@ -1,4 +1,4 @@
-# Cashflow Tracker
+# CashCatalyst - Cash Flow Management
 
 ## About this project
 For individuals or lean teams managing the finances of a business, cash flow is fundamental and has the most direct and immediate impact on operations. This tool helps you easily record cash activities, intelligently analyze your business's cash flow based on financial accounting principles, and collaborate with team members.
