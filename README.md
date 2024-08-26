@@ -1,3 +1,4 @@
+![alt text](static/cashcatalyst-logo-inspired.svg)
 # CashCatalyst - Cash Flow Management
 
 ## About this project
