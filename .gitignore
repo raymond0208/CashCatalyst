@@ -2,6 +2,7 @@
 *.py[cod]
 __pycache__/
 *.so
+app_ref.py
 
 # Flask
 instance/
