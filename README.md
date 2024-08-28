@@ -1,4 +1,4 @@
-![alt text](static/cashcatalyst-logo-inspired.svg)
+![alt text](static/images/cashcatalyst-logo-inspired.svg)
 # CashCatalyst - Cash Flow Management
 
 ## About this project
@@ -39,27 +39,27 @@ The tool is using SQLite database, you can switch to other databases if your req
 1. Open browser type `http://127.0.0.1:5000/` the default local address or your custom address
 
 2. App requires login, user can choose register account and login again
-![alt text](loginpage.png)
+![alt text](static/images/loginpage.png)
 
 3. Set initial cash balance - what you have in hand
-![alt text](initialbalance.png)
+![alt text](static/images/initialbalance.png)
 
 4. Record Cash Activity in "Edit Cash Transaction", choose the corresponding type
-![alt text](transaction.png)
+![alt text](static/images/transaction.png)
 
 5. Edit or delete the record from "Transaction Records", you can also drag and drop it
-![alt text](transactiontable.png)
+![alt text](static/images/transactiontable.png)
 
 6. Export cash record table as csv/excel for further use
 
 7. The main form will automatically calculate latest balance, and three fundamental cashflow financial elements
-![alt text](balanceoverview.png)
+![alt text](static/images/balanceoverview.png)
 
 8. Switch to the second tab of homepage, user can calculate the accurate balance on specific date
 ![alt text](balancebydate.png)
 
 9. Thrid tab on homepage is the AI analysis based on cash status, it'll give forecast and suggestion
-![alt text](aianalysis.png)
+![alt text](static/images/aianalysis.png)
 
 ## How to contribute
 You are welcome to submit issues or pull request.
@@ -116,4 +116,4 @@ The main features include:
 6. User management
 
 ## UI main page
-![alt text](UI-main.png)
+![alt text](static/images/UI-main.png)
