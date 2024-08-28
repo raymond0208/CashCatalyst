@@ -5,25 +5,25 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<style>
-    .custom-submit {
-        background-color: #4CAF50; /* Change this to your desired color */
-        color: white; /* Change the text color */
-        border: none;
-        padding: 10px 20px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 4px 2px;
-        cursor: pointer;
-        border-radius: 8px; /* Optional: rounded corners */
-    }
+    <style>
+        .custom-submit {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
 
-    .custom-submit:hover {
-        background-color: #45a049; /* Darker shade for hover effect */
-    }
-</style>
+        .custom-submit:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -40,7 +40,9 @@
             </div>
             <p>{{ form.submit(class="custom-submit") }}</p>
         </form>
+        {% if 'register' in request.endpoint %}
         <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+        {% endif %}
     </div>
 </body>
 </html>
