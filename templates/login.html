@@ -33,27 +33,16 @@
             <div class="mb-3">
                 {{ form.username.label(class="form-label") }}
                 {{ form.username(class="form-control") }}
-                {% for error in form.username.errors %}
-                    <span class="text-danger">{{ error }}</span>
-                {% endfor %}
             </div>
             <div class="mb-3">
                 {{ form.password.label(class="form-label") }}
                 {{ form.password(class="form-control") }}
-                {% for error in form.password.errors %}
-                    <span class="text-danger">{{ error }}</span>
-                {% endfor %}
             </div>
-            {{ form.submit(class="custom-submit") }}
+            <p>{{ form.submit(class="custom-submit") }}</p>
         </form>
+        {% if 'register' in request.endpoint %}
         <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+        {% endif %}
     </div>
 </body>
 </html>

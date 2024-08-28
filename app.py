@@ -70,6 +70,7 @@ def login():
             flash('Login Unsuccessful. Please check username and password', 'danger')
     return render_template('login.html', form=form)
 
+@app.route('/register',methods=['GET','POST'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
