@@ -1,9 +1,11 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Transaction, InitialBalance
 from forms import LoginForm, RegistrationForm
 from anthropic_service import generate_financial_analysis
+from upload_handler import process_upload
 from utils import calculate_totals
 from config import Config
 import pandas as pd
@@ -22,8 +24,10 @@ login_manager.login_view = 'login'
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    #return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))
 
+#All routes in app
 @app.route('/')
 @app.route('/home', methods=['GET', 'POST'])
 @login_required
@@ -117,6 +121,26 @@ def delete_transaction(transaction_id):
     flash('Your Transaction Deleted!', 'danger')
     return redirect(url_for('home'))
 
+@app.route('/upload', methods=['GET', 'POST'])
+@login_required
+def upload_route():
+    if request.method == 'GET':
+        return render_template('upload.html')
+    elif request.method == 'POST':
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file part'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No selected file'}), 400
+        
+        try:
+            result = process_upload(file)
+            return jsonify(result)
+        except Exception as e:
+            app.logger.error(f"Error in upload_file: {str(e)}")
+            return jsonify({'error': str(e)}), 500
+
 @app.route('/set-initial-balance', methods=['POST'])
 @login_required
 def set_initial_balance():
@@ -160,6 +184,25 @@ def export(file_type):
     else:
         flash('Invalid file type requested.', 'danger')
         return redirect(url_for('home'))
+
+@app.route('/save_transactions', methods=['POST'])
+@login_required
+def save_transactions():
+    data = request.json
+    try:
+        for item in data:
+            new_transaction = Transaction(
+                date=item['date'],
+                description=item['description'],
+                amount=float(item['amount']),
+                type=item['type']
+            )
+            db.session.add(new_transaction)
+        db.session.commit()
+        return jsonify({'message': 'Transactions saved successfully'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500 
 
 @app.route('/balance-by-date', methods=['POST'])
 @login_required

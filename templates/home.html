@@ -315,6 +315,7 @@
 
         <!-- Export Buttons -->
         <div class="export-buttons-section">
+            <a href="{{ url_for('upload_route') }}" class="btn btn-primary">Upload Cashflow Data</a>
             <a href="{{  url_for('export', file_type='csv')  }}" class="btn btn-success">Export as CSV</a>
             <a href="{{  url_for('export', file_type='excel')  }}" class="btn btn-success">Export as Excel</a>
         </div>
