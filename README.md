@@ -70,11 +70,7 @@ The tool is using SQLite database, you can switch to other databases if your req
 ![alt text](static/images/aianalysis.png)
 
 ## ❤️ Stargazers
-[![Stargazers repo roster for @raymond0208/CashCatalyst]  
-(https://reporoster.com/stars/raymond0208/CashCatalyst)]  
-(https://github.com/raymond0208/CashCatalyst/stargazers)  
+[![Stargazers repo roster for @raymond0208/CashCatalyst](https://reporoster.com/stars/raymond0208/CashCatalyst)](https://github.com/raymond0208/CashCatalyst/stargazers)
 ## ❤️ Forkers
-[![Forkers repo roster for @raymond0208/CashCatalyst]  
-(https://reporoster.com/forks/raymond0208/CashCatalyst)]  
-(https://github.com/raymond0208/CashCatalyst/network/members)  
+[![Forkers repo roster for @raymond0208/CashCatalyst](https://reporoster.com/forks/raymond0208/CashCatalyst)](https://github.com/raymond0208/CashCatalyst/network/members)
 
