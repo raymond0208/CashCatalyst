@@ -18,6 +18,7 @@ env/
 .env
 
 # Database
+instance/
 *.db
 *.sqlite
 
@@ -86,3 +87,6 @@ htmlcov/
 .cache
 coverage.xml
 *.cover
+
+# Other file
+get-pip.py
