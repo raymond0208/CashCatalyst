@@ -5,11 +5,12 @@
 For individuals or lean teams managing the finances of a business, cash flow is fundamental and has the most direct and immediate impact on operations. This tool helps you easily record cash activities, intelligently analyze your business's cash flow based on financial accounting principles, and collaborate with team members.
 
 ## &#10024; Core Features
-1. **Easly record** and edit each cashflow record 
-2. **AI analysis** based on cashflow record
-3. **Cashflow summary** under finance report perspective
-4. **Check and predict** cashflow balance
-5. **Share and collaborate** with other memebers
+1. **Easly record** and edit each cashflow record
+2. **Upload your own** cashflow record file for data integration
+3. **AI analysis** based on cashflow record
+4. **Cashflow summary** under finance report perspective
+5. **Check and predict** cashflow balance
+6. **Share and collaborate** with other memebers
 
 ## &#128640; Quick Start
 ### 1. Clone the repository
@@ -52,21 +53,27 @@ The tool is using SQLite database, you can switch to other databases if your req
 2. Set initial cash balance - what you have in hand
 ![alt text](static/images/initialbalance.png)
 
-3. Record Cash Activity in "Edit Cash Transaction", choose the corresponding type
+3. Record Cash Activity in "Edit Cash Transaction" from the webpage, positive/negative cash amount means cash inflow/outflow, choose the corresponding type
 ![alt text](static/images/transaction.png)
 
-4. Edit or delete the record from "Transaction Records", you can also drag and drop it
+4. User can also upload their cashflow worksheet into editing, `.csv/.xlx/.xlsx` formats supported.Right now uploaded file has to follow the template format, sample worksheet is included in the repo as `sample-cashflow-worksheet.csv`
+![alt text](static/images/uploadworksheet.png)
+
+5. The data inside uploaded file will display in the "Data Preview" frame, user can match each record with cashflow type from dropdown list. By Clicking the save button, result will be uploaded and combined with existing cashflow table
+![alt text](static/images/uploadpreview.png)
+
+6. Edit or delete the record from "Transaction Records", you can also drag and drop record to adjust position
 ![alt text](static/images/transactiontable.png)
 
-6. Export cash record table as csv/excel for further use
+7. Export cash record table as csv/excel for collaboration and future edition
 
-5. The main form will automatically calculate latest balance, and three fundamental cashflow financial elements
+8. The main form will automatically calculate latest balance, and three fundamental cashflow financial elements
 ![alt text](static/images/balanceoverview.png)
 
-7. Switch to the second tab of homepage, user can calculate the accurate balance on specific date
+9. Switch to the second tab of homepage, user can calculate the accurate balance on specific date
 ![alt text](balancebydate.png)
 
-8. Thrid tab on homepage is the AI analysis based on cash status, it'll give forecast and suggestion
+10. Thrid tab on homepage is the AI analysis based on cash status, it'll give forecast and suggestion
 ![alt text](static/images/aianalysis.png)
 
 ## ❤️ Stargazers
