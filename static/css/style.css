@@ -187,38 +187,34 @@ th {
     margin-left: 10px;
 }
 
-#anthropic-analysis {
-    background-color: #f8f9fa;
+#balance-by-date-result {
     border-radius: 5px;
-    padding: 20px;
+    padding: 15px;
     margin-top: 20px;
-    text-align: left;
+    min-height: 20px; /* Ensure there's always some visible space */
+}
+
+#balance-by-date-result h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+#balance-by-date-result p {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #366aa9;
+    margin: 0;
+}
+
+#balance-by-date-result .text-danger {
+    color: #dc3545;
 }
 
 #analysis-content {
-    white-space: pre-wrap;
-    font-family: 'Courier New', Courier, monospace;
     background-color: #ffffff;
     border: 1px solid #e9ecef;
-    border-radius: 5px;
-    padding: 15px;
-    margin-top: 15px;
-    align-items: flex-start;
-}
-
-#generate-analysis-btn {
-    background-color: #17a2b8;
-    border: none;
-    color: white;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 0;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s;
+    min-height: 140px;
 }
 
 #generate-analysis-btn:hover {

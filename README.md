@@ -71,7 +71,7 @@ The tool is using SQLite database, you can switch to other databases if your req
 ![alt text](static/images/balanceoverview.png)
 
 9. Switch to the second tab of homepage, user can calculate the accurate balance on specific date
-![alt text](balancebydate.png)
+![alt text](static/images/balancebydate.png)
 
 10. Thrid tab on homepage is the AI analysis based on cash status, it'll give forecast and suggestion
 ![alt text](static/images/aianalysis.png)

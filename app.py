@@ -152,7 +152,6 @@ def set_initial_balance():
     else:
         initial_balance_record = InitialBalance(balance=initial_balance_value)
         db.session.add(initial_balance_record)
-    db.session.query(Transaction).delete()
     db.session.commit()
     flash('Initial balance set successfully', 'success')
     return redirect(url_for('home'))

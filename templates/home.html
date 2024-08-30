@@ -30,7 +30,7 @@
             {% endif %}
         {% endwith %}
 
-        <!-- Tabs for balance information -->
+        <!-- Tabs button area -->
         <ul class="nav nav-tabs" id="balanceTab" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="total-balance-tab" data-bs-toggle="tab" data-bs-target="#total-balance" type="button" role="tab" aria-controls="total-balance" aria-selected="true">Total Balance</button>
@@ -88,12 +88,12 @@
             </div>
 
             <!-- Balance by Date Tab -->
-            <div class="tab-pane fade" id="balance-by-date" role="tabpanel" aria-labelledby="balance-by-date-tab">
+            <div id="balance-by-date" class="tab-pane fade" role="tabpanel" aria-labelledby="balance-by-date-tab">
                 <div class="balance-section mt-4">
-                    <h3>Balance by Date</h3>
-                    <form id="balance-by-date-form">
+                    <h4>Balance by Date</h4>
+                    <form id="balance-by-date-form" action="{{ url_for('balance_by_date') }}" method="post">
                         <div class="mb-3">
-                            <input type="date" class="form-control" id="date" name="date" required>
+                            <input type="date" name="date" class="form-control" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Calculate</button>
                     </form>
@@ -236,150 +236,6 @@
         </div>
     </div>
 
-    <script>
-        window.onload = function() {
-            setTimeout(function() {
-                var flashMessages = document.querySelectorAll('.alert');
-                flashMessages.forEach(function(message) {
-                    message.classList.add('hidden');
-                });
-            }, 3000);
-        }
-
-        document.addEventListener('DOMContentLoaded', (event) => {
-            const table = document.getElementById('transactionTable');
-            let draggingRow = null;
-
-            table.addEventListener('dragstart', (e) => {
-                draggingRow = e.target.closest('tr');
-                draggingRow.classList.add('dragging');
-                //e.dataTransfer.effectAllowed = 'move';
-            });
-
-            
-
-            table.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                const afterElement = getDragAfterElement(table, e.clientY);
-                const draggable = document.querySelector('.dragging');
-                if (afterElement == null) {
-                    table.querySelector('tbody').appendChild(draggable);
-                } else {
-                    table.querySelector('tbody').insertBefore(draggable, afterElement);
-                }
-            });
-
-            table.addEventListener('dragenter', (e) => {
-                if (e.target.tagName === 'TR' && e.target !== draggingRow) {
-                    e.target.classList.add('drag-over');
-                }
-            });
-
-            table.addEventListener('dragleave', (e) => {
-                if (e.target.tagName === 'TR' && e.target !== draggingRow) {
-                    e.target.classList.remove('drag-over');
-                }
-            });
-
-            table.addEventListener('dragend', () => {
-                if(draggingRow){
-                    draggingRow.classList.remove('dragging');
-                    draggingRow = null;
-                    const rows = table.querySelectorAll('tr');
-                    rows.forEach(row => row.classList.remove('drag-over'));
-                }
-            });
-
-            function getDragAfterElement(table, y) {
-                const draggableElements = [...table.querySelectorAll('tr:not(.dragging)')];
-
-                return draggableElements.reduce((closest, child) => {
-                    const box = child.getBoundingClientRect();
-                    const offset = y - box.top - box.height / 2;
-                    if (offset < 0 && offset > closest.offset) {
-                        return { offset: offset, element: child };
-                    } else {
-                        return closest;
-                    }
-                }, { offset: Number.NEGATIVE_INFINITY }).element;
-            }
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get all tab buttons and content
-            const tabs = document.querySelectorAll('.nav-link');
-            const tabContents = document.querySelectorAll('.tab-pane');
-
-            // Function to set active tab
-            function setActiveTab(clickedTab) {
-                // Remove active class from all tabs and contents
-                tabs.forEach(tab => tab.classList.remove('active'));
-                tabContents.forEach(content => {
-                    content.classList.remove('show', 'active');
-                });
-
-                // Add active class to clicked tab and its content
-                clickedTab.classList.add('active');
-                const contentId = clickedTab.getAttribute('data-bs-target').slice(1);
-                const activeContent = document.getElementById(contentId);
-                activeContent.classList.add('show', 'active');
-            }
-
-            // Add click event listeners to tabs
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    setActiveTab(this);
-                });
-            });
-
-            //Handle balance-by-date form submission
-            const balanceByDateForm = document.getElementById('balance-by-date-form');
-            const balanceByDateResult = document.getElementById('balance-by-date-result');
-
-            balanceByDateForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                const formData = new FormData(this);
-
-                fetch('{{ url_for("balance_by_date") }}', {
-                    method:'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    balanceByDateResult.innerHTML = `
-                        <h4>Balance up to ${data.input_date}</h4>
-                        <p>$${data.balance_sum.toFixed(2)}</p>
-                        `;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    balanceByDateResult.innerHTML = '<p>An error occurred. Please try again.</p>';
-                });
-            });
-
-            const generateAnalysisBtn = document.getElementById('generate-analysis');
-            const analysisContent = document.getElementById('analysis-content');
-            const loadingIndicator = document.getElementById('loading');
-
-            generateAnalysisBtn.addEventListener('click', function() {
-                loadingIndicator.style.display = 'block';
-                analysisContent.innerHTML = '';
-
-                fetch('/forecast')
-                    .then(response => response.json())
-                    .then(data => {
-                        loadingIndicator.style.display = 'none';
-                        analysisContent.innerHTML = `<div class="analysis-text">${data.analysis}</div>`;
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        loadingIndicator.style.display = 'none';
-                        analysisContent.innerHTML = '<p>An error occurred while generating the analysis. Please try again.</p>';
-                    });
-            });
-        });
-    </script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
