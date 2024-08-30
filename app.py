@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from typing_extensions import Annotated
 from models import db, User, Transaction, InitialBalance
 from forms import LoginForm, RegistrationForm
 from anthropic_service import generate_financial_analysis

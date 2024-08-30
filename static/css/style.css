@@ -1,0 +1,246 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+    padding: 20px;
+}
+
+.user-info {
+    background: #f0f0f0; /* Lighter background color */
+    color: #333; /* Darker text color for contrast */
+    padding: 10px;
+    text-align: right;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 15px;
+    background: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    border-radius: 5px;
+}
+
+.btn-primary {
+    background: #007bff;
+}
+
+.btn-success {
+    background: #28a745;
+}
+
+.btn-danger {
+    background: #dc3545;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+.balance-section {
+    background: #fff;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.balance-item {
+    background: #f9f9f9;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.pagination {
+    display: flex;
+    justify-content: left;
+    list-style: none;
+    padding: 0;
+}
+
+.page-link {
+    padding: 5px 10px;
+    margin: 0 2px;
+    border: 1px solid #007bff;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.page-link:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+    }
+}
+
+.custom-submit {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.custom-submit:hover {
+    background-color: #45a049;
+}
+
+#flash-messages {
+    margin-bottom: 20px;
+}
+
+.fade-out {
+    transition: opacity 0.5s ease-out;
+}
+
+.tab-content {
+    margin-top: 20px;
+}
+
+.balance-item h4 {
+    margin-top: 0;
+    color: #333;
+    text-align: center;
+}
+
+#loading {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.error {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.export-buttons-section {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.export-buttons-section .btn {
+    margin-left: 10px;
+}
+
+#anthropic-analysis {
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+#analysis-content {
+    white-space: pre-wrap;
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    padding: 15px;
+    margin-top: 15px;
+}
+
+#generate-analysis-btn {
+    background-color: #17a2b8;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+#generate-analysis-btn:hover {
+    background-color: #138496;
+}
+
+#analysis-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#analysis-content th, #analysis-content td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+#analysis-content th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+#analysis-content ul {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+#analysis-content li {
+    margin-bottom: 5px;
+}
