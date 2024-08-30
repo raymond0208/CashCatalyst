@@ -6,6 +6,10 @@ body {
     background-color: #f4f4f4;
 }
 
+hr {
+    margin-bottom: 50px;
+}
+
 .container {
     width: 80%;
     margin: auto;
@@ -76,7 +80,7 @@ th {
     margin-top: 20px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
+    margin-bottom: 50px; 
 }
 
 .balance-item {
@@ -176,6 +180,7 @@ th {
 .export-buttons-section {
     margin-top: 20px;
     text-align: left;
+    margin-bottom: 50px; 
 }
 
 .export-buttons-section .btn {
@@ -187,6 +192,7 @@ th {
     border-radius: 5px;
     padding: 20px;
     margin-top: 20px;
+    text-align: left;
 }
 
 #analysis-content {
@@ -197,6 +203,7 @@ th {
     border-radius: 5px;
     padding: 15px;
     margin-top: 15px;
+    align-items: flex-start;
 }
 
 #generate-analysis-btn {
@@ -208,7 +215,7 @@ th {
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
-    margin: 4px 2px;
+    margin: 4px 0;
     cursor: pointer;
     border-radius: 5px;
     transition: background-color 0.3s;
