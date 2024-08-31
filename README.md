@@ -31,13 +31,15 @@ deactivate
 ```
 
 ### 5. Configure LLM API key
-This app uses Anthropic Claude API for AI function.  To use this part,you need to setup your own API.\
-1. Inside your project root folder, rename the `.env.example` dummy file to `.env`
-2. Replace the dummy values in .env with your actual API keys
+This app uses Anthropic Claude API for AI function. To use this part,you need to setup your own API.
+1. Inside your project root folder, make sure you have created `.env` file
+2. Inside `.env` setup your Anthropic API keys `ANTHROPIC_API_KEY = api-key`  
+
+Other Large Language Model(LLM) like OpenAI,Gemini can be configured as well.
 
 ### 4. Launch the app
 ```sh
-$ python3 app.py or $python app.py
+$ python3 main.py or $python main.py
 ```
 
 ### 5. Database

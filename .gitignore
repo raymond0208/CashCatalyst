@@ -5,7 +5,6 @@ __pycache__/
 app_ref.py
 
 # Flask
-instance/
 .webassets-cache
 
 # Virtual Environment
@@ -18,9 +17,7 @@ env/
 .env
 
 # Database
-instance/
-*.db
-*.sqlite
+
 
 # IDE specific files
 .vscode/

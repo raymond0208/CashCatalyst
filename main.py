@@ -1,14 +1,15 @@
 import os
+#from src import routes
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from typing_extensions import Annotated
-from models import db, User, Transaction, InitialBalance
-from forms import LoginForm, RegistrationForm
-from anthropic_service import generate_financial_analysis
-from upload_handler import process_upload
-from utils import calculate_totals
-from config import Config
+from src.models import db, User, Transaction, InitialBalance
+from src.forms import LoginForm, RegistrationForm
+from src.anthropic_service import generate_financial_analysis
+from src.upload_handler import process_upload
+from src.utils import calculate_totals
+from src.config import Config
 import pandas as pd
 from io import BytesIO
 from dotenv import load_dotenv
@@ -16,10 +17,20 @@ from dotenv import load_dotenv
 #load Anthropic LLM API key and other variables in .env
 load_dotenv
 
-app = Flask(__name__)
+# Ensure instance folder exists
+instance_path = os.path.join(os.path.dirname(__file__),'instance')
+os.makedirs(instance_path, exist_ok=True)
+
+app = Flask(__name__,
+            template_folder='templates',
+            static_folder='static')
 app.config.from_object(Config)
 
 db.init_app(app)
+
+with app.app_context():
+    db.create_all
+    
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
@@ -29,7 +40,7 @@ def load_user(user_id):
     return db.session.get(User, int(user_id))
 
 #All routes in app
-@app.route('/')
+@app.route('/',methods=['GET','POST'])
 @app.route('/home', methods=['GET', 'POST'])
 @login_required
 def home():
