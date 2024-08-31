@@ -5,7 +5,6 @@ __pycache__/
 app_ref.py
 
 # Flask
-instance/
 .webassets-cache
 
 # Virtual Environment

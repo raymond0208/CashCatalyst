@@ -8,7 +8,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + db_path
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY')
-    UPLOAD_FOLDER = os.path.join(basedir, 'uploads')
+    UPLOAD_FOLDER = os.path.join(basedir, '..', 'uploads')
 
     # Print the Anthropic API key status for debugging
     print(f"Database path: {db_path}")
