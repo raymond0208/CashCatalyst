@@ -17,8 +17,7 @@ env/
 .env
 
 # Database
-*.db
-*.sqlite
+
 
 # IDE specific files
 .vscode/
