@@ -117,6 +117,7 @@ function handleTabSwitching() {
     });
 }
 
+// Generate AI analysis
 function handleAIAnalysis() {
     var generateButton = document.querySelector('#generate-analysis');
     if (generateButton) {
@@ -138,6 +139,45 @@ function handleAIAnalysis() {
                 .catch(error => {
                     loadingDiv.style.display = 'none';
                     analysisContent.innerHTML = `<p class="text-danger">Failed to generate analysis: ${error}</p>`;
+                });
+        });
+    }
+}
+
+// AI generates cashflow statement
+function handleCashFlowStatement() {
+    var generateButton = document.querySelector('#generate-cashflow-statement');
+    if (generateButton) {
+        generateButton.addEventListener('click', function() {
+            var loadingDiv = document.querySelector('#loading');
+            var analysisContent = document.querySelector('#analysis-content');
+            loadingDiv.style.display = 'block';
+            analysisContent.innerHTML = '';
+            fetch('/generate_cashflow_statement')
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(err.error || `HTTP status ${response.status}`);
+                        });
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    loadingDiv.style.display = 'none';
+                    var url = window.URL.createObjectURL(blob);
+                    var a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = 'cash_flow_statement.xlsx';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    analysisContent.innerHTML = '<p class="text-success">Cash flow statement generated and downloaded successfully.</p>';
+                })
+                .catch(error => {
+                    loadingDiv.style.display = 'none';
+                    console.error('Error:', error);
+                    analysisContent.innerHTML = `<p class="text-danger">Failed to generate cash flow statement: ${error.message}</p>`;
                 });
         });
     }
@@ -355,6 +395,7 @@ document.addEventListener('DOMContentLoaded', function() {
     handleBalanceByDate();
     handleTabSwitching();
     handleAIAnalysis();
+    handleCashFlowStatement();
     handleInitialBalance();
     handleTransactionForm();
     handleDeleteConfirmation();
