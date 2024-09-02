@@ -2,12 +2,12 @@
 # &#x1F3E6; CashCatalyst - Cash Flow Management
 
 ## &#9889; About this project
-For individuals or lean teams managing the finances of a business, cash flow is fundamental and has the most direct and immediate impact on operations. This tool helps you easily record cash activities, intelligently analyze your business's cash flow based on financial accounting principles, and collaborate with team members.
+For individuals or lean teams managing the finances of a business, cash flow is fundamental and has the most direct and immediate impact on operations. This tool utilizes cutting-edge AI capabilities to help users analyze their business under various cash scenarios and automatically generate cash flow statements based on financial accounting principles. Additionally, it provides an easy way to record cash activities and collaborate with team members.
 
 ## &#10024; Core Features
-1. **Easly record** and edit each cashflow record
-2. **Upload your own** cashflow record file for data integration
-3. **AI analysis** based on cashflow record
+1. **AI analysis** based on cashflow record
+2. **AI generated** cashflow statmentes
+3. **Easly record** and integrate your own cashflow data
 4. **Cashflow summary** under finance report perspective
 5. **Check and predict** cashflow balance
 6. **Share and collaborate** with other memebers
@@ -75,8 +75,12 @@ The tool is using SQLite database, you can switch to other databases if your req
 9. Switch to the second tab of homepage, user can calculate the accurate balance on specific date
 ![alt text](static/images/balancebydate.png)
 
-10. Thrid tab on homepage is the AI analysis based on cash status, it'll give forecast and suggestion
-![alt text](static/images/aianalysis.png)
+10. Thrid tab is the featured AI functions based on cash data, it'll give forecast and suggestion, automatically generate cashflow statement
+![alt text](static/images/ai-tab.png)
+**AI Analysis**
+![alt text](static/images/ai-analysis.png)
+**AI Generated Cashflow Statement**  
+![alt text](static/images/ai-statement.png)
 
 ## ❤️ Stargazers
 [![Stargazers repo roster for @raymond0208/CashCatalyst](https://reporoster.com/stars/raymond0208/CashCatalyst)](https://github.com/raymond0208/CashCatalyst/stargazers)
