@@ -106,7 +106,7 @@ def generate_cashflow_statement(initial_balance, start_date, end_date, transacti
     try:
         current_app.logger.info("Sending request to Anthropic API")
         message = anthropic.messages.create(
-            model="claude-3-sonnet-20240620",
+            model="claude-3-sonnet-20240229",
             max_tokens=2000,
             messages=[
                 {"role": "user", "content": prompt}
