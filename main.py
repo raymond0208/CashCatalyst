@@ -6,13 +6,17 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from typing_extensions import Annotated
 from src.models import db, User, Transaction, InitialBalance
 from src.forms import LoginForm, RegistrationForm
-from src.anthropic_service import generate_financial_analysis
+from src.anthropic_service import generate_financial_analysis,generate_cashflow_statement
 from src.upload_handler import process_upload
 from src.utils import calculate_totals
 from src.config import Config
 import pandas as pd
 from io import BytesIO
 from dotenv import load_dotenv
+import traceback
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.utils import get_column_letter
 
 #load Anthropic LLM API key and other variables in .env
 load_dotenv
@@ -252,6 +256,132 @@ def forecast():
     except Exception as e:
         app.logger.error(f"Failed to generate analysis: {str(e)}")
         return jsonify({'error': 'Failed to generate analysis'}), 500
+
+@app.route('/generate_cashflow_statement', methods=['GET'])
+@login_required
+def generate_cashflow_statement_route():
+    try:
+        transactions = Transaction.query.order_by(Transaction.date).all()
+        if not transactions:
+            app.logger.warning("No transactions found when generating cash flow statement")
+            return jsonify({'error': 'No transactions found'}), 400
+
+        initial_balance_record = InitialBalance.query.first()
+        initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
+
+        start_date = transactions[0].date
+        end_date = transactions[-1].date
+
+        transaction_data = "\n".join([f"Date: {t.date}, Description: {t.description}, Amount: {t.amount}, Type: {t.type}" for t in transactions])
+
+        app.logger.info(f"Generating cash flow statement for period {start_date} to {end_date}")
+        
+        try:
+            statement_data = generate_cashflow_statement(initial_balance, start_date, end_date, transaction_data)
+        except ValueError as ve:
+            app.logger.error(f"Error in generate_cashflow_statement: {str(ve)}")
+            return jsonify({'error': f'Failed to generate statement: {str(ve)}'}), 500
+
+        if not statement_data:
+            app.logger.error("generate_cashflow_statement returned None")
+            return jsonify({'error': 'Failed to generate statement: No data returned'}), 500
+
+        app.logger.info("Cash flow statement generated successfully")
+        app.logger.debug(f"Statement data: {statement_data}")
+
+        # Create a new workbook and select the active sheet
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Cash Flow Statement"
+
+        # Set column widths
+        ws.column_dimensions['A'].width = 40
+        ws.column_dimensions['B'].width = 15
+
+        # Add title
+        ws['A1'] = f"Cash Flow Statement - {start_date} to {end_date}"
+        ws['A1'].font = Font(bold=True, size=14)
+        ws.merge_cells('A1:B1')
+
+        # Add headers
+        headers = ['Category', 'Amount']
+        for col, header in enumerate(headers, start=1):
+            cell = ws.cell(row=3, column=col, value=header)
+            cell.font = Font(bold=True)
+            cell.fill = PatternFill(start_color="D3D3D3", end_color="D3D3D3", fill_type="solid")
+
+        # Helper function to add a row with formatting
+        def add_row(row, category, amount, is_total=False, indent=0):
+            ws.cell(row=row, column=1, value=category).alignment = Alignment(indent=indent)
+            ws.cell(row=row, column=2, value=amount)
+            if is_total:
+                for col in range(1, 3):
+                    ws.cell(row=row, column=col).font = Font(bold=True)
+
+        # Add Beginning Cash Balance
+        row = 4
+        add_row(row, "Beginning Cash Balance", initial_balance, True)
+        row += 2
+
+        # Process and add data for each category
+        categories = ['CFO', 'CFI', 'CFF']
+        for category in categories:
+            ws.cell(row=row, column=1, value=f"Cash Flow from {'Operating' if category == 'CFO' else 'Investing' if category == 'CFI' else 'Financing'} Activities ({category})")
+            ws.cell(row=row, column=1).font = Font(bold=True)
+            ws.cell(row=row, column=1).fill = PatternFill(start_color="D3D3D3", end_color="D3D3D3", fill_type="solid")
+            row += 1
+
+            category_total = 0
+            for item in statement_data:
+                if item['Category'] == category:
+                    add_row(row, item['Subcategory'], item['Amount'], indent=1)
+                    category_total += item['Amount']
+                    row += 1
+
+            add_row(row, f"Net Cash from {'Operating' if category == 'CFO' else 'Investing' if category == 'CFI' else 'Financing'}", category_total, True)
+            row += 2
+
+        # Add Total Net Cash Flow
+        total_net_cash_flow = sum(item['Amount'] for item in statement_data)
+        add_row(row, "Total Net Cash Flow", total_net_cash_flow, True)
+        row += 2
+
+        # Add Ending Cash Balance
+        ending_balance = initial_balance + total_net_cash_flow
+        add_row(row, "Ending Cash Balance", ending_balance, True)
+
+        # Apply currency formatting to amount column
+        for row in ws['B4:B' + str(ws.max_row)]:
+            for cell in row:
+                cell.number_format = '#,##0.00'
+
+        # Apply right alignment to amount column
+        for row in ws['B1:B' + str(ws.max_row)]:
+            for cell in row:
+                cell.alignment = Alignment(horizontal='right')
+
+        # Add borders
+        thin_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+        for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=2):
+            for cell in row:
+                cell.border = thin_border
+
+        # Save to BytesIO object
+        output = BytesIO()
+        wb.save(output)
+        output.seek(0)
+
+        app.logger.info("Excel file created successfully")
+        return send_file(
+            output,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            as_attachment=True,
+            download_name='cash_flow_statement.xlsx'
+        )
+    except Exception as e:
+        app.logger.error(f"Failed to generate cash flow statement: {str(e)}")
+        app.logger.error(traceback.format_exc())
+        return jsonify({'error': f'Failed to generate cash flow statement: {str(e)}'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
