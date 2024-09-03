@@ -23,9 +23,7 @@
             </div>
             <p>{{ form.submit(class="custom-submit") }}</p>
         </form>
-        {% if 'register' in request.endpoint %}
         <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
-        {% endif %}
     </div>
 </body>
 </html>
