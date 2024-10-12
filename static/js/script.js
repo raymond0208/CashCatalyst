@@ -377,6 +377,52 @@ function handleAuthForms() {
     // Add any specific handling for registration and login forms if needed
 }
 
+
+function handleMonthlyBalanceChart() {
+    console.log("Setting up monthly balance chart handler");
+    
+    // Instead of looking for the tab link, we'll look for the tab content
+    const balanceByDateTab = document.getElementById('balance-by-date');
+    
+    if (balanceByDateTab) {
+        console.log("Balance by date tab found");
+        
+        // We'll use MutationObserver to detect when the tab becomes visible
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    if (balanceByDateTab.classList.contains('active') && balanceByDateTab.classList.contains('show')) {
+                        console.log("Balance by date tab is now active");
+                        fetchMonthlyBalances();
+                    }
+                }
+            });
+        });
+
+        observer.observe(balanceByDateTab, { attributes: true });
+    } else {
+        console.error("Balance by date tab not found");
+        console.log("Looking for element with id: balance-by-date");
+    }
+}
+
+function fetchMonthlyBalances() {
+    console.log("Fetching monthly balances");
+    fetch('/monthly-balances')
+        .then(response => response.json())
+        .then(data => {
+            console.log("Received monthly balance data:", data);
+            const chartImg = document.getElementById('monthly-balance-chart');
+            if (chartImg) {
+                chartImg.src = data.chart_image;
+                console.log("Updated chart image source");
+            } else {
+                console.error("Chart image element not found");
+            }
+        })
+        .catch(error => console.error('Error fetching monthly balances:', error));
+}
+
 // Main execution
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM fully loaded");
@@ -402,4 +448,5 @@ document.addEventListener('DOMContentLoaded', function() {
     handleFileUpload();
     handleEditTransaction();
     handleAuthForms();
+    handleMonthlyBalanceChart();
 });

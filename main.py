@@ -17,6 +17,15 @@ import traceback
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
+import matplotlib.pyplot as plt
+import io
+import base64
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.dates import MonthLocator, DateFormatter
+import matplotlib.ticker as ticker
+from datetime import datetime
+import calendar
 
 #load Anthropic LLM API key and other variables in .env
 load_dotenv
@@ -276,15 +285,14 @@ def generate_cashflow_statement_route():
 
         app.logger.info(f"Generating cash flow statement for period {start_date} to {end_date}")
         
-        try:
-            statement_data = generate_cashflow_statement(initial_balance, start_date, end_date, transaction_data)
-        except ValueError as ve:
-            app.logger.error(f"Error in generate_cashflow_statement: {str(ve)}")
-            return jsonify({'error': f'Failed to generate statement: {str(ve)}'}), 500
-
+        statement_data,ending_balance = generate_cashflow_statement(initial_balance, start_date, end_date, transaction_data)
+        
         if not statement_data:
             app.logger.error("generate_cashflow_statement returned None")
             return jsonify({'error': 'Failed to generate statement: No data returned'}), 500
+
+        app.logger.info("Cash flow statement generated sucessfully")
+        app.logger.debug(f"Statement data: {statement_data}")
 
         app.logger.info("Cash flow statement generated successfully")
         app.logger.debug(f"Statement data: {statement_data}")
@@ -382,6 +390,97 @@ def generate_cashflow_statement_route():
         app.logger.error(f"Failed to generate cash flow statement: {str(e)}")
         app.logger.error(traceback.format_exc())
         return jsonify({'error': f'Failed to generate cash flow statement: {str(e)}'}), 500
+    
+# Generate monthly chart function    
+def generate_monthly_balance_chart():
+    transactions = Transaction.query.order_by(Transaction.date).all()
+    initial_balance_record = InitialBalance.query.first()
+    initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
+
+    monthly_balances = []
+    current_balance = initial_balance
+    current_month = None
+
+    for transaction in transactions:
+        transaction_date = datetime.strptime(transaction.date, '%Y-%m-%d').date()
+        
+        if current_month != transaction_date.replace(day=1):
+            if current_month:
+                last_day = calendar.monthrange(current_month.year, current_month.month)[1]
+                monthly_balances.append({
+                    'date': current_month.replace(day=last_day),
+                    'balance': current_balance
+                })
+            current_month = transaction_date.replace(day=1)
+
+        current_balance += transaction.amount
+
+    # Add the last month's balance
+    if current_month:
+        last_day = calendar.monthrange(current_month.year, current_month.month)[1]
+        monthly_balances.append({
+            'date': current_month.replace(day=last_day),
+            'balance': current_balance
+        })
+
+    # Create the chart
+    fig = Figure(figsize=(12, 6))
+    axis = fig.add_subplot(1, 1, 1)
+    dates = [balance['date'] for balance in monthly_balances]
+    balances = [balance['balance'] for balance in monthly_balances]
+    axis.plot(dates, balances, marker='o')  # Added markers for each data point
+
+    # Improve Y-axis formatting
+    def currency_formatter(x, p):
+        return f'${x:,.0f}'
+    
+    axis.yaxis.set_major_formatter(ticker.FuncFormatter(currency_formatter))
+    
+    # Adjust Y-axis ticks for better readability
+    axis.yaxis.set_major_locator(ticker.MaxNLocator(nbins=10, integer=True))
+    
+    # Format X-axis to show dates nicely
+    axis.xaxis.set_major_locator(MonthLocator())
+    axis.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
+
+    axis.set_title('Monthly Balance', fontsize=16, fontweight='bold')
+    axis.set_xlabel('Date', fontsize=12)
+    axis.set_ylabel('Balance ($)', fontsize=12)
+    axis.tick_params(axis='both', which='major', labelsize=10)
+    axis.tick_params(axis='x', rotation=45)
+    
+    # Add gridlines for better readability
+    axis.grid(True, linestyle='--', alpha=0.7)
+    
+    # Add some padding to the y-axis
+    ylim = axis.get_ylim()
+    axis.set_ylim([ylim[0] - (ylim[1] - ylim[0]) * 0.1, ylim[1] + (ylim[1] - ylim[0]) * 0.1])
+
+    fig.tight_layout()
+
+    # Convert plot to PNG image
+    png_image = io.BytesIO()
+    FigureCanvas(fig).print_png(png_image)
+    
+    # Encode PNG image to base64 string
+    png_image_b64_string = "data:image/png;base64,"
+    png_image_b64_string += base64.b64encode(png_image.getvalue()).decode('utf8')
+
+    return png_image_b64_string
+
+#Map plotting chart
+@app.route('/monthly-balances', methods=['GET'])
+@login_required
+def monthly_balances():
+    try:
+        app.logger.info("Starting to generate monthly balance chart")
+        chart_image = generate_monthly_balance_chart()
+        app.logger.info("Chart generated successfully")
+        return jsonify({'chart_image': chart_image})
+    except Exception as e:
+        app.logger.error(f"Error generating monthly balance chart: {str(e)}")
+        app.logger.exception("Detailed traceback:")
+        return jsonify({'error': 'Failed to generate chart: ' + str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

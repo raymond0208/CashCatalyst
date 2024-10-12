@@ -48,21 +48,19 @@ def generate_financial_analysis(initial_balance, current_balance, total_cfo, tot
     except Exception as e:
         current_app.logger.error(f"Error calling Anthropic API: {str(e)}")
         raise
-
+    
 def generate_cashflow_statement(initial_balance, start_date, end_date, transaction_data):
     api_key = current_app.config.get('ANTHROPIC_API_KEY')
     
     if not api_key:
-        current_app.logger.error("ANTHROPIC_API_KEY is not set in the application configuration")
         raise ValueError("ANTHROPIC_API_KEY is not set in the application configuration")
     
     try:
         anthropic = Anthropic(api_key=api_key)
     except Exception as e:
-        current_app.logger.error(f"Failed to initialize Anthropic client: {str(e)}")
         raise ValueError(f"Failed to initialize Anthropic client: {str(e)}")
 
-    prompt = f"""As a financial analyst, generate a detailed cash flow statement based on the following data:
+    prompt = f"""As a financial expert, generate a detailed cash flow statement based on the following data:
 
     Initial Balance: ${initial_balance}
     Start Date: {start_date}
@@ -71,40 +69,33 @@ def generate_cashflow_statement(initial_balance, start_date, end_date, transacti
     Transaction Data:
     {transaction_data}
 
-    Please provide a cash flow statement with the following main categories and subcategories:
-    1. Cash flows from Operating Activities (CFO)
-       - Cash from customers
-       - Cash paid to suppliers and employees
-       - Interest paid
-       - Income taxes paid
-       - Other operating cash flows
-    2. Cash flows from Investing Activities (CFI)
-       - Purchase of property and equipment
-       - Sale of property and equipment
-       - Purchase of investments
-       - Sale of investments
-       - Other investing cash flows
-    3. Cash flows from Financing Activities (CFF)
-       - Proceeds from issuing shares
-       - Proceeds from long-term borrowings
-       - Repayment of long-term borrowings
-       - Dividends paid
-       - Other financing cash flows
+    Please provide the following:
+    1. A categorized breakdown of cash flows (CFO, CFI, CFF) with subcategories.
+       Note: Classify bank interest payments under Cash Flow from Financing (CFF), not Cash Flow from Operations (CFO).
+    2. Total net cash flow for each category (CFO, CFI, CFF).
+    3. Overall net cash flow.
+    4. Ending cash balance.
 
-    Format your response as a Python list of dictionaries, where each dictionary represents a subcategory in the cash flow statement. Each dictionary should have 'Category', 'Subcategory', and 'Amount' keys. The 'Category' should be one of 'CFO', 'CFI', or 'CFF'. The 'Amount' should be a float value representing the sum for that subcategory.
+    Present the data in a clear, structured format. Use a simple list format with each item on a new line, like this:
 
-    Example format:
-    [
-        {{"Category": "CFO", "Subcategory": "Cash from customers", "Amount": 50000.0}},
-        {{"Category": "CFO", "Subcategory": "Cash paid to suppliers and employees", "Amount": -30000.0}},
-        {{"Category": "CFI", "Subcategory": "Purchase of property and equipment", "Amount": -5000.0}},
-        {{"Category": "CFF", "Subcategory": "Proceeds from long-term borrowings", "Amount": 10000.0}},
-    ]
+    CFO: Cash from customers: 1000
+    CFO: Payments to suppliers: -500
+    CFI: Purchase of equipment: -2000
+    CFF: Bank loan: 5000
+    CFF: Interest paid: -200
+    ...
 
-    Ensure that your response can be directly evaluated as a Python list of dictionaries."""
+    After listing all items, provide the totals and ending balance in the same format:
+
+    Total CFO: 500
+    Total CFI: -2000
+    Total CFF: 4800
+    Overall Net Cash Flow: 3300
+    Ending Cash Balance: 4300
+
+    Ensure all calculations are accurate and consistent with the provided transaction data."""
 
     try:
-        current_app.logger.info("Sending request to Anthropic API")
         message = anthropic.messages.create(
             model="claude-3-sonnet-20240229",
             max_tokens=2000,
@@ -112,30 +103,74 @@ def generate_cashflow_statement(initial_balance, start_date, end_date, transacti
                 {"role": "user", "content": prompt}
             ]
         )
-        response_text = message.content[0].text
-        current_app.logger.info("Received response from Anthropic API")
-        current_app.logger.debug(f"Raw API response: {response_text}")
-        
-        # Parse the response
-        statement_data = ast.literal_eval(response_text)
+        response = message.content[0].text
 
-        if not isinstance(statement_data, list):
-            raise ValueError("Response is not a list of dictionaries")
-        
-        for item in statement_data:
-            if not isinstance(item, dict) or 'Category' not in item or 'Subcategory' not in item or 'Amount' not in item:
-                raise ValueError(f"Invalid item structure in response: {item}")
-            if item['Amount'] is None:
-                current_app.logger.warning(f"None value found for Amount in item: {item}")
-                item['Amount'] = 0.0
-            try:
-                item['Amount'] = float(item['Amount'])
-            except ValueError:
-                current_app.logger.warning(f"Invalid Amount value in item: {item}")
-                item['Amount'] = 0.0
-        
-        return statement_data
+        # Log the complete API response
+        current_app.logger.info(f"Complete API response:\n{response}")
+
+        # Parse the response
+        statement_data, totals = parse_response(response)
+
+        if not statement_data:
+            current_app.logger.error("Failed to parse API response")
+            return {'error': 'Parsing failed', 'raw_response': response}, None
+
+        # Calculate ending balance
+        ending_balance = totals.get('Ending Cash Balance')
+        if ending_balance is None:
+            ending_balance = initial_balance + totals.get('Overall Net Cash Flow', 0)
+
+        current_app.logger.info(f"Cash Flow Statement Calculation: {totals}")
+        current_app.logger.info(f"Ending Balance: {ending_balance}")
+
+        return statement_data, ending_balance
+
     except Exception as e:
-        current_app.logger.error(f"Error processing API response: {str(e)}")
-        current_app.logger.error(f"API response: {response_text}")
-        raise ValueError(f"Error processing API response: {str(e)}")
+        current_app.logger.error(f"Error generating cash flow statement: {str(e)}")
+        current_app.logger.error(f"Error details: {type(e).__name__}, {str(e)}")
+        raise
+
+def parse_response(response):
+    lines = response.strip().split('\n')
+    statement_data = []
+    totals = {}
+
+    for line in lines:
+        try:
+            if ':' not in line:
+                continue
+            
+            if line.count(':') == 2:  # This is a transaction line
+                category, subcategory_and_amount = line.split(':', 1)
+                subcategory, amount_str = subcategory_and_amount.rsplit(':', 1)
+                
+                category = category.strip()
+                subcategory = subcategory.strip()
+                amount = parse_amount(amount_str)
+                
+                statement_data.append({
+                    'Category': category,
+                    'Subcategory': subcategory,
+                    'Amount': amount
+                })
+            elif line.count(':') == 1:  # This is a total line
+                key, value_str = line.split(':')
+                key = key.strip()
+                value = parse_amount(value_str)
+                totals[key] = value
+        except Exception as e:
+            current_app.logger.warning(f"Error parsing line '{line}': {str(e)}")
+
+    if not statement_data:
+        current_app.logger.error("No valid statement data found in response")
+    if not totals:
+        current_app.logger.error("No valid totals found in response")
+
+    return statement_data, totals
+
+def parse_amount(amount_str):
+    try:
+        return float(amount_str.replace('$', '').replace(',', '').strip())
+    except ValueError:
+        current_app.logger.warning(f"Could not parse amount: {amount_str}")
+        return 0.0
