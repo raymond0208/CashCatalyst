@@ -1,7 +1,7 @@
 def calculate_totals(transactions):
-    cfo_types = ["Cash-customer", "Salary-suppliers", "Interest-paid", "Income-tax", "Other-cfo"]
+    cfo_types = ["Cash-customer", "Salary-suppliers", "Income-tax", "Other-cfo"]
     cfi_types = ["Buy-property-equipments", "Sell-property-equipments", "Buy-investment", "Sell-investment", "Other-cfi"]
-    cff_types = ["Issue-shares", "borrowings", "Repay-borrowings", "Pay-dividends", "Other-cff"]
+    cff_types = ["Issue-shares", "borrowings", "Repay-borrowings", "Pay-dividends", "Interest-paid", "Other-cff"]
 
     total_cfo = sum(t.amount for t in transactions if t.type in cfo_types)
     total_cfi = sum(t.amount for t in transactions if t.type in cfi_types)
