@@ -1,12 +1,12 @@
 import os
 #from src import routes
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file, current_app
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from typing_extensions import Annotated
 from src.models import db, User, Transaction, InitialBalance
 from src.forms import LoginForm, RegistrationForm
-from src.anthropic_service import generate_financial_analysis,generate_cashflow_statement
+from src.anthropic_service import FinancialAnalytics
 from src.upload_handler import process_upload
 from src.utils import calculate_totals
 from src.config import Config
@@ -245,25 +245,56 @@ def balance_by_date():
 @app.route('/forecast', methods=['GET'])
 @login_required
 def forecast():
-    transactions = Transaction.query.order_by(Transaction.date).all()
-    initial_balance_record = InitialBalance.query.first()
-    initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
-
-    total_cfo, total_cfi, total_cff = calculate_totals(transactions)
-    current_balance = initial_balance + total_cfo + total_cfi + total_cff
-
-    transaction_data = "\n".join([f"Date: {t.date}, Amount: {t.amount}, Type: {t.type}" for t in transactions])
-
     try:
-        analysis = generate_financial_analysis(
-            initial_balance, current_balance, total_cfo, total_cfi, total_cff, transaction_data
+        # Get transaction data
+        transactions = Transaction.query.order_by(Transaction.date).all()
+        if not transactions:
+            return jsonify({'error': 'No transaction data available'}), 400
+
+        initial_balance_record = InitialBalance.query.first()
+        initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
+
+        # Calculate current balance and totals
+        total_cfo, total_cfi, total_cff = calculate_totals(transactions)
+        current_balance = initial_balance + total_cfo + total_cfi + total_cff
+
+        # Format transaction history for analysis
+        transaction_history = [
+            {
+                'date': t.date.strftime('%Y-%m-%d') if isinstance(t.date, datetime) else t.date,
+                'amount': float(t.amount),
+                'type': t.type
+            } for t in transactions
+        ]
+
+        # Mock working capital data
+        working_capital = {
+            'current_assets': current_balance if current_balance > 0 else 0,
+            'current_liabilities': abs(current_balance) if current_balance < 0 else 0,
+            'cash': current_balance if current_balance > 0 else 0
+        }
+
+        # Initialize FinancialAnalytics and generate analysis
+        api_key = current_app.config.get('ANTHROPIC_API_KEY')
+        if not api_key:
+            return jsonify({'error': 'API key not configured'}), 500
+
+        analytics = FinancialAnalytics(api_key)
+        analysis_result = analytics.generate_advanced_financial_analysis(
+            initial_balance=initial_balance,
+            current_balance=current_balance,
+            transaction_history=transaction_history,
+            working_capital=working_capital
         )
-        return jsonify({'analysis': analysis})
+
+        return jsonify(analysis_result)
+
     except ValueError as ve:
         app.logger.error(f"Configuration error: {str(ve)}")
-        return jsonify({'error': 'API key not configured'}), 500
+        return jsonify({'error': str(ve)}), 500
     except Exception as e:
         app.logger.error(f"Failed to generate analysis: {str(e)}")
+        app.logger.exception("Detailed traceback:")
         return jsonify({'error': 'Failed to generate analysis'}), 500
 
 @app.route('/generate_cashflow_statement', methods=['GET'])
@@ -285,7 +316,7 @@ def generate_cashflow_statement_route():
 
         app.logger.info(f"Generating cash flow statement for period {start_date} to {end_date}")
         
-        statement_data,ending_balance = generate_cashflow_statement(initial_balance, start_date, end_date, transaction_data)
+        statement_data,ending_balance = FinancialAnalytics.generate_cashflow_statement(initial_balance, start_date, end_date, transaction_data)
         
         if not statement_data:
             app.logger.error("generate_cashflow_statement returned None")

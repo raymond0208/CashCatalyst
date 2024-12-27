@@ -124,21 +124,50 @@ function handleAIAnalysis() {
         generateButton.addEventListener('click', function() {
             var loadingDiv = document.querySelector('#loading');
             var analysisContent = document.querySelector('#analysis-content');
+            var analysisDashboard = document.querySelector('#analysis-dashboard');
+            var rawAnalysis = document.querySelector('#raw-analysis');
+            
             loadingDiv.style.display = 'block';
-            analysisContent.innerHTML = '';
+            analysisDashboard.style.display = 'none';
+            rawAnalysis.innerHTML = '';
+            
             fetch('/forecast')
                 .then(response => response.json())
                 .then(data => {
                     loadingDiv.style.display = 'none';
                     if (data.error) {
-                        analysisContent.innerHTML = `<p class="text-danger">${data.error}</p>`;
+                        rawAnalysis.innerHTML = `<p class="text-danger">${data.error}</p>`;
                     } else {
-                        analysisContent.innerHTML = `<pre>${data.analysis}</pre>`;
+                        // Show the dashboard
+                        analysisDashboard.style.display = 'block';
+                        
+                        // Update pattern recognition
+                        if (data.patterns) {
+                            document.querySelector('#pattern-recognition-content').innerHTML = 
+                                formatPatternAnalysis(data.patterns);
+                        }
+                        
+                        // Update risk assessment
+                        if (data.risk_metrics) {
+                            document.querySelector('#risk-assessment-content').innerHTML = 
+                                formatRiskMetrics(data.risk_metrics);
+                        }
+                        
+                        // Update charts
+                        if (data.patterns?.seasonal_pattern) {
+                            updateSeasonalChart(data.patterns.seasonal_pattern);
+                        }
+                        if (data.forecasts) {
+                            updateForecastChart(data.forecasts);
+                        }
+                        
+                        // Display raw analysis
+                        rawAnalysis.innerHTML = `<pre>${data.ai_analysis}</pre>`;
                     }
                 })
                 .catch(error => {
                     loadingDiv.style.display = 'none';
-                    analysisContent.innerHTML = `<p class="text-danger">Failed to generate analysis: ${error}</p>`;
+                    rawAnalysis.innerHTML = `<p class="text-danger">Failed to generate analysis: ${error}</p>`;
                 });
         });
     }
@@ -421,6 +450,121 @@ function fetchMonthlyBalances() {
             }
         })
         .catch(error => console.error('Error fetching monthly balances:', error));
+}
+
+function formatPatternAnalysis(patterns) {
+    const formatTrend = (trend) => {
+        const [slope, intercept] = trend;
+        const direction = slope > 0 ? 'Upward' : slope < 0 ? 'Downward' : 'Stable';
+        return `${direction} (slope: ${slope.toFixed(2)})`;
+    };
+
+    return `
+        <ul class="list-unstyled">
+            <li><strong>Trend:</strong> ${formatTrend(patterns.trend)}</li>
+            <li><strong>Volatility:</strong> $${patterns.volatility.toFixed(2)}</li>
+            <li><strong>Seasonal Pattern:</strong> ${patterns.seasonal_pattern.length > 0 ? 'Detected' : 'Insufficient data'}</li>
+        </ul>
+    `;
+}
+
+function formatRiskMetrics(metrics) {
+    const formatNumber = (num) => {
+        if (num >= 9999) {
+            return '∞';
+        }
+        return num.toFixed(2);
+    };
+
+    return `
+        <ul class="list-unstyled">
+            <li><strong>Liquidity Ratio:</strong> ${formatNumber(metrics.liquidity_ratio)}</li>
+            <li><strong>Cash Flow Volatility:</strong> $${formatNumber(metrics.cash_flow_volatility)}</li>
+            <li><strong>Burn Rate:</strong> $${formatNumber(metrics.burn_rate)}/month</li>
+            <li><strong>Cash Runway:</strong> ${formatNumber(metrics.runway_months)} months</li>
+        </ul>
+    `;
+}
+
+function updateSeasonalChart(seasonalData) {
+    const ctx = document.getElementById('seasonal-chart').getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (window.seasonalChart) {
+        window.seasonalChart.destroy();
+    }
+
+    window.seasonalChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: Array.from({length: seasonalData.length}, (_, i) => `Month ${i + 1}`),
+            datasets: [{
+                label: 'Seasonal Pattern',
+                data: seasonalData,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Seasonal Effect ($)'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function updateForecastChart(forecasts) {
+    const ctx = document.getElementById('forecast-chart').getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (window.forecastChart) {
+        window.forecastChart.destroy();
+    }
+
+    window.forecastChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: Array.from({length: 90}, (_, i) => `Day ${i + 1}`),
+            datasets: [{
+                label: '30-Day Forecast',
+                data: forecasts['30_days'],
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1,
+                fill: false
+            }, {
+                label: '60-Day Forecast',
+                data: forecasts['60_days'],
+                borderColor: 'rgb(255, 159, 64)',
+                tension: 0.1,
+                fill: false
+            }, {
+                label: '90-Day Forecast',
+                data: forecasts['90_days'],
+                borderColor: 'rgb(255, 99, 132)',
+                tension: 0.1,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Projected Amount ($)'
+                    }
+                }
+            }
+        }
+    });
 }
 
 // Main execution

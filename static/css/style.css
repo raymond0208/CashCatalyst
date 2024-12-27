@@ -247,3 +247,36 @@ th {
 #analysis-content li {
     margin-bottom: 5px;
 }
+
+#analysis-dashboard .card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+}
+
+#analysis-dashboard .card-header {
+    background-color: #f8f9fa;
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+}
+
+#analysis-dashboard .card-body {
+    padding: 1rem;
+    min-height: 200px;
+}
+
+.analysis-controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+#loading {
+    margin: 2rem 0;
+}
+
+#raw-analysis {
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+}
