@@ -581,6 +581,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, 3000);
 
+    // Sidebar collapse functionality
+    const collapseButton = document.querySelector('.collapse-menu');
+    const sidebar = document.querySelector('.sidebar');
+    const menuTexts = document.querySelectorAll('.menu-item span, .collapse-menu span');
+    
+    if (collapseButton) {
+        collapseButton.addEventListener('click', function() {
+            sidebar.classList.toggle('collapsed');
+            menuTexts.forEach(text => {
+                text.style.display = sidebar.classList.contains('collapsed') ? 'none' : 'inline';
+            });
+            collapseButton.querySelector('i').classList.toggle('fa-angles-right');
+            collapseButton.querySelector('i').classList.toggle('fa-angles-left');
+        });
+    }
+
     // Call all handler functions
     handleBalanceByDate();
     handleTabSwitching();

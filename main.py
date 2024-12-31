@@ -513,5 +513,10 @@ def monthly_balances():
         app.logger.exception("Detailed traceback:")
         return jsonify({'error': 'Failed to generate chart: ' + str(e)}), 500
 
+@app.route('/settings')
+@login_required
+def settings():
+    return render_template('settings.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
