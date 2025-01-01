@@ -18,3 +18,11 @@ class Transaction(db.Model):
 class InitialBalance(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     balance = db.Column(db.Float, nullable=False)
+
+class UserPreferences(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    modules = db.Column(db.JSON, default=list)
+    email_notifications = db.Column(db.Boolean, default=True)
+    
+    user = db.relationship('User', backref=db.backref('preferences', lazy=True))

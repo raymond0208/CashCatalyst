@@ -1,10 +1,9 @@
 import os
-#from src import routes
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file, current_app
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from typing_extensions import Annotated
-from src.models import db, User, Transaction, InitialBalance
+from src.models import db, User, Transaction, InitialBalance, UserPreferences
 from src.forms import LoginForm, RegistrationForm
 from src.anthropic_service import FinancialAnalytics
 from src.upload_handler import process_upload
@@ -26,9 +25,10 @@ from matplotlib.dates import MonthLocator, DateFormatter
 import matplotlib.ticker as ticker
 from datetime import datetime
 import calendar
+from flask_migrate import Migrate
 
 #load Anthropic LLM API key and other variables in .env
-load_dotenv
+load_dotenv()
 
 # Ensure instance folder exists
 instance_path = os.path.join(os.path.dirname(__file__),'instance')
@@ -41,8 +41,10 @@ app.config.from_object(Config)
 
 db.init_app(app)
 
+migrate = Migrate(app, db)
+
 with app.app_context():
-    db.create_all
+    db.create_all()
     
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -112,6 +114,9 @@ def register():
             hashed_password = generate_password_hash(form.password.data)
             new_user = User(username=form.username.data, password=hashed_password)
             db.session.add(new_user)
+            db.session.commit()
+            new_preferences = UserPreferences(user_id=new_user.id)
+            db.session.add(new_preferences)
             db.session.commit()
             flash('Your account has been created! You can now log in.', 'success')
             return redirect(url_for('login'))
@@ -516,7 +521,56 @@ def monthly_balances():
 @app.route('/settings')
 @login_required
 def settings():
-    return render_template('settings.html')
+    user_preferences = UserPreferences.query.filter_by(user_id=current_user.id).first()
+    return render_template('settings.html', user_preferences=user_preferences)
+
+@app.route('/update_profile', methods=['POST'])
+@login_required
+def update_profile():
+    current_user.username = request.form.get('username')
+    current_user.email = request.form.get('email')
+    db.session.commit()
+    flash('Profile updated successfully', 'success')
+    return redirect(url_for('settings'))
+
+@app.route('/change_password', methods=['POST'])
+@login_required
+def change_password():
+    if check_password_hash(current_user.password, request.form.get('current_password')):
+        if request.form.get('new_password') == request.form.get('confirm_password'):
+            current_user.password = generate_password_hash(request.form.get('new_password'))
+            db.session.commit()
+            flash('Password changed successfully', 'success')
+        else:
+            flash('New passwords do not match', 'danger')
+    else:
+        flash('Current password is incorrect', 'danger')
+    return redirect(url_for('settings'))
+
+@app.route('/update_modules', methods=['POST'])
+@login_required
+def update_modules():
+    user_preferences = UserPreferences.query.filter_by(user_id=current_user.id).first()
+    if not user_preferences:
+        user_preferences = UserPreferences(user_id=current_user.id)
+        db.session.add(user_preferences)
+    user_preferences.modules = request.form.getlist('modules')
+    db.session.commit()
+    flash('Module preferences updated successfully', 'success')
+    return redirect(url_for('settings'))
+
+@app.context_processor
+def utility_processor():
+    def get_user_preferences():
+        if current_user.is_authenticated:
+            prefs = UserPreferences.query.filter_by(user_id=current_user.id).first()
+            if not prefs:
+                prefs = UserPreferences(user_id=current_user.id)
+                db.session.add(prefs)
+                db.session.commit()
+            return prefs
+        return None
+    return dict(user_preferences=get_user_preferences())
 
 if __name__ == '__main__':
     app.run(debug=True)

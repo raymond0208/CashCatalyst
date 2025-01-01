@@ -6,6 +6,9 @@
     --secondary-color: #f7f7f7;
     --text-color: #333;
     --border-color: #e0e0e0;
+    --dark-blue: #1e2935;
+    --dark-blue-hover: #2a3847;
+    --menu-text: rgba(255, 255, 255, 0.8);
 }
 
 .app-theme1 {
@@ -24,7 +27,7 @@
 /* Sidebar Styles */
 .sidebar {
     width: var(--sidebar-width);
-    background-color: #1e2935;
+    background-color: var(--dark-blue);
     color: white;
     display: flex;
     flex-direction: column;
@@ -58,7 +61,7 @@
     display: flex;
     align-items: center;
     padding: 0.75rem 1rem;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--menu-text);
     text-decoration: none;
     transition: background-color 0.2s ease;
     font-size: 16px;
@@ -76,12 +79,12 @@
 }
 
 .menu-item:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--dark-blue-hover);
     color: white;
 }
 
 .menu-item.active {
-    background-color: var(--primary-color);
+    background-color: var(--dark-blue-hover);
     color: white;
 }
 
@@ -389,8 +392,8 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 60px;
-    background-color: #1e2935;
+    height: var(--top-bar-height);
+    background-color: var(--dark-blue);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -409,6 +412,8 @@
     font-weight: 700;
     color: white;
     letter-spacing: 0.5px;
+    text-transform: none;
+    font-family: 'Inter', sans-serif;
 }
 
 /* Tab Content Styles */
@@ -433,4 +438,41 @@
 /* When sidebar is collapsed */
 .sidebar.collapsed + .main-content {
     width: calc(100vw - var(--sidebar-collapsed-width));
+}
+
+.settings-container {
+    width: 100%;
+    max-width: none;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.settings-section {
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.settings-section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #2D3748;
+}
+
+.settings-section .card {
+    width: 100%;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: white;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.form-check {
+    padding: 1rem;
+    border-radius: 6px;
+    background-color: var(--secondary-color);
 }
