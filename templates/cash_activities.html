@@ -19,16 +19,15 @@
         {% endif %}
     {% endwith %}
 
-    <!-- Balance by Date Section -->
-    <div class="balance-section mt-4">
-        <h3>Balance by Date</h3>
-        <form id="balance-by-date-form" action="{{ url_for('balance_by_date') }}" method="post">
+    <!-- Form to set the initial balance -->
+    <div class="initial-balance-section mt-4">
+        <form method="POST" action="{{ url_for('set_initial_balance') }}">
+            <h3>Set Initial Cash Balance</h3>
             <div class="mb-3">
-                <input type="date" name="date" class="form-control" required>
+                <input type="number" step="0.01" class="form-control" id="initial_balance" name="initial_balance" required>
             </div>
-            <button type="submit" class="btn btn-primary">Calculate Balance</button>
+            <button type="submit" class="btn btn-secondary">Set Initial Balance</button>
         </form>
-        <div id="balance-by-date-result" class="mt-3"></div>
     </div>
 
     <!-- Form to record transaction -->
@@ -91,7 +90,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for transaction in transactions %}
+                {% for transaction in transactions.items %}
                 <tr class='table-row' draggable="true">
                     <td>{{ transaction.date }}</td>
                     <td>{{ transaction.description }}</td>
@@ -107,6 +106,37 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <!-- Pagination Controls -->
+        {% if transactions.pages > 1 %}
+        <nav aria-label="Transaction pagination">
+            <ul class="pagination justify-content-center">
+                {% if transactions.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('cash_activities', page=transactions.prev_num) }}">&laquo; Previous</a>
+                </li>
+                {% endif %}
+
+                {% for page_num in transactions.iter_pages(left_edge=2, left_current=2, right_current=2, right_edge=2) %}
+                    {% if page_num %}
+                        <li class="page-item {% if page_num == transactions.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('cash_activities', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if transactions.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('cash_activities', page=transactions.next_num) }}">Next &raquo;</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
     </div>
 
     <!-- Export Buttons -->

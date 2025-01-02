@@ -155,12 +155,27 @@ class FinancialAnalytics:
         Transaction Data:
         {transaction_data}
 
-        Please provide the following:
-        1. A categorized breakdown of cash flows (CFO, CFI, CFF) with subcategories.
-           Note: Classify bank interest payments under Cash Flow from Financing (CFF), not Cash Flow from Operations (CFO).
-        2. Total net cash flow for each category (CFO, CFI, CFF).
-        3. Overall net cash flow.
-        4. Ending cash balance.
+        Please follow these strict categorization rules:
+        
+        Cash Flow from Operations (CFO):
+        - Cash from customers
+        - Salary and supplier payments
+        - Income tax payments
+        - Other operating activities
+
+        Cash Flow from Investing (CFI):
+        - Purchase/sale of property and equipment
+        - Purchase/sale of investments
+        - Other investing activities
+
+        Cash Flow from Financing (CFF):
+        - Bank loans and repayments
+        - Interest payments
+        - Share issuance
+        - Dividend payments
+        - Other financing activities
+
+        Important: Salary and supplier payments MUST be categorized under CFO, not CFF.
 
         Present the data in a clear, structured format. Use a simple list format with each item on a new line, like this:
 
