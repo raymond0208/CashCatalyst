@@ -46,75 +46,19 @@ function handleBalanceByDate() {
                     throw new Error(data.error);
                 }
                 balanceByDateResult.innerHTML = `
-                    <h4>Balance up to ${data.input_date}</h4>
-                    <p>$${parseFloat(data.balance_sum).toFixed(2)}</p>
+                    <div class="alert alert-info">
+                        <h4>Balance as of ${data.date}</h4>
+                        <p class="h3">$${parseFloat(data.balance).toFixed(2)}</p>
+                    </div>
                 `;
                 console.log("Updated result div:", balanceByDateResult.innerHTML);
             })
             .catch(error => {
                 console.error('Error:', error);
-                balanceByDateResult.innerHTML = `<p class="text-danger">Error: ${error.message}</p>`;
+                balanceByDateResult.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
             });
         });
-    } else {
-        console.error("Balance by date form or result div not found");
-        console.log("Form:", balanceByDateForm);
-        console.log("Result div:", balanceByDateResult);
     }
-}
-// Handle Tab Switching
-function handleTabSwitching() {
-    console.log("Setting up tab switching");
-    const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
-    console.log("Found " + tabButtons.length + " tab buttons");
-    
-    if (tabButtons.length === 0) {
-        console.error("No tab buttons found. Check your HTML structure.");
-        return;
-    }
-
-    tabButtons.forEach(button => {
-        console.log("Adding click listener to button:", button.id);
-        button.addEventListener('click', function(event) {
-            event.preventDefault();
-            
-            // Get the target from href or data-bs-target
-            const target = this.getAttribute('href') || this.getAttribute('data-bs-target');
-            console.log("Tab clicked. Target:", target);
-            
-            if (!target) {
-                console.error("No target found for this tab button");
-                return;
-            }
-
-            const targetId = target.slice(1); // Remove the leading #
-            
-            console.log("Hiding all tab panes");
-            document.querySelectorAll('.tab-pane').forEach(pane => {
-                pane.classList.remove('show', 'active');
-                console.log("Removed classes from pane:", pane.id);
-            });
-            
-            console.log("Deactivating all tab buttons");
-            tabButtons.forEach(btn => {
-                btn.classList.remove('active');
-                btn.setAttribute('aria-selected', 'false');
-                console.log("Deactivated button:", btn.id);
-            });
-            
-            const targetPane = document.getElementById(targetId);
-            if (targetPane) {
-                console.log("Activating tab pane:", targetId);
-                targetPane.classList.add('show', 'active');
-            } else {
-                console.error("Target pane not found:", targetId);
-            }
-            
-            console.log("Activating clicked tab button");
-            this.classList.add('active');
-            this.setAttribute('aria-selected', 'true');
-        });
-    });
 }
 
 // Generate AI analysis
@@ -236,20 +180,56 @@ function handleFileUpload() {
     if (uploadForm) {
         uploadForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            
+            // Show loading state
+            const submitButton = uploadForm.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...';
+            }
+
             var formData = new FormData(uploadForm);
             fetch('/upload', {
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.error || 'Failed to upload file');
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.error) {
-                    alert(data.error);
+                    throw new Error(data.error);
+                }
+                // Clear any previous error messages
+                const errorDiv = document.getElementById('uploadError');
+                if (errorDiv) {
+                    errorDiv.style.display = 'none';
+                }
+                displayDataPreview(data.data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Display error message on the page
+                const errorDiv = document.getElementById('uploadError');
+                if (errorDiv) {
+                    errorDiv.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+                    errorDiv.style.display = 'block';
                 } else {
-                    displayDataPreview(data.data);
+                    alert(error.message || 'An error occurred during upload');
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .finally(() => {
+                // Reset button state
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = 'Upload File';
+                }
+            });
         });
     }
 }
@@ -385,17 +365,76 @@ function getUpdatedData(originalData) {
 }
 
 function saveTransactions(data) {
+    const saveButton = document.querySelector('#dataPreview button');
+    if (saveButton) {
+        saveButton.disabled = true;
+        saveButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+    }
+
     fetch('/save_transactions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
-    .then(result => {
-        alert(result.message);
-        window.location.href = '/home';
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => {
+                // Extract the main error message from SQLAlchemy error
+                let errorMessage = err.error;
+                if (errorMessage.includes('IntegrityError')) {
+                    errorMessage = 'Failed to save transactions. Please try logging in again.';
+                }
+                throw new Error(errorMessage);
+            });
+        }
+        return response.json();
     })
-    .catch(error => console.error('Error:', error));
+    .then(result => {
+        if (result.error) {
+            throw new Error(result.error);
+        }
+        // Show success message
+        const previewDiv = document.getElementById('dataPreview');
+        if (previewDiv) {
+            previewDiv.innerHTML = `
+                <div class="alert alert-success">
+                    ${result.message}
+                    <div class="mt-2">
+                        <a href="/cash-activities" class="btn btn-primary">View Transactions</a>
+                    </div>
+                </div>
+            `;
+        } else {
+            alert(result.message || 'Transactions saved successfully');
+            window.location.href = '/cash-activities';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Show error in the preview div if possible
+        const previewDiv = document.getElementById('dataPreview');
+        if (previewDiv) {
+            previewDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    ${error.message}
+                    <div class="mt-2">
+                        <button onclick="window.location.reload()" class="btn btn-primary">Try Again</button>
+                    </div>
+                </div>
+            `;
+        } else {
+            alert(error.message || 'An error occurred while saving transactions');
+        }
+    })
+    .finally(() => {
+        if (saveButton) {
+            saveButton.disabled = false;
+            saveButton.innerHTML = 'Save Transactions';
+        }
+    });
 }
 
 function handleEditTransaction() {
@@ -406,41 +445,31 @@ function handleAuthForms() {
     // Add any specific handling for registration and login forms if needed
 }
 
-
 function handleMonthlyBalanceChart() {
     console.log("Setting up monthly balance chart handler");
     
-    // Instead of looking for the tab link, we'll look for the tab content
-    const balanceByDateTab = document.getElementById('balance-by-date');
-    
-    if (balanceByDateTab) {
-        console.log("Balance by date tab found");
-        
-        // We'll use MutationObserver to detect when the tab becomes visible
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                    if (balanceByDateTab.classList.contains('active') && balanceByDateTab.classList.contains('show')) {
-                        console.log("Balance by date tab is now active");
-                        fetchMonthlyBalances();
-                    }
-                }
-            });
-        });
-
-        observer.observe(balanceByDateTab, { attributes: true });
-    } else {
-        console.error("Balance by date tab not found");
-        console.log("Looking for element with id: balance-by-date");
+    // Check if we're on the cash overview page by looking for the chart container
+    const chartContainer = document.querySelector('.monthly-chart-section');
+    if (chartContainer) {
+        console.log("Found chart container, fetching monthly balances");
+        fetchMonthlyBalances();
     }
 }
 
 function fetchMonthlyBalances() {
     console.log("Fetching monthly balances");
     fetch('/monthly-balances')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch monthly balances');
+            }
+            return response.json();
+        })
         .then(data => {
             console.log("Received monthly balance data:", data);
+            if (data.error) {
+                throw new Error(data.error);
+            }
             const chartImg = document.getElementById('monthly-balance-chart');
             if (chartImg) {
                 chartImg.src = data.chart_image;
@@ -449,7 +478,17 @@ function fetchMonthlyBalances() {
                 console.error("Chart image element not found");
             }
         })
-        .catch(error => console.error('Error fetching monthly balances:', error));
+        .catch(error => {
+            console.error('Error fetching monthly balances:', error);
+            const chartContainer = document.querySelector('.monthly-chart-section');
+            if (chartContainer) {
+                chartContainer.innerHTML += `
+                    <div class="alert alert-danger mt-3">
+                        Failed to load monthly balance chart: ${error.message}
+                    </div>
+                `;
+            }
+        });
 }
 
 function formatPatternAnalysis(patterns) {
@@ -599,7 +638,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Call all handler functions
     handleBalanceByDate();
-    handleTabSwitching();
     handleAIAnalysis();
     handleCashFlowStatement();
     handleInitialBalance();

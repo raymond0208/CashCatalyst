@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="content-header">
+        <div class="breadcrumb-nav">
+            <span>Workspace</span> / <span>AI Analysis</span>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="mt-3" id="flash-messages">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} fade-out" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="balance-section mt-4">
+        <h3>AI Financial Analysis</h3>
+        
+        <!-- Analysis Controls -->
+        <div class="analysis-controls mb-4">
+            <button id="generate-analysis" class="btn btn-primary">Generate Advanced Analysis</button>
+            <button id="generate-cashflow-statement" class="btn btn-secondary">Generate Cash Flow Statement</button>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading" class="text-center" style="display: none;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <!-- Analysis Content Container -->
+        <div id="analysis-content">
+            <!-- Advanced Analytics Dashboard -->
+            <div id="analysis-dashboard" style="display: none;">
+                <div class="row g-4">
+                    <!-- Pattern Recognition Card -->
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">Pattern Recognition</div>
+                            <div class="card-body" id="pattern-recognition-content"></div>
+                        </div>
+                    </div>
+
+                    <!-- Risk Assessment Card -->
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">Risk Assessment</div>
+                            <div class="card-body" id="risk-assessment-content"></div>
+                        </div>
+                    </div>
+
+                    <!-- Seasonal Analysis Card -->
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">Seasonal Trends</div>
+                            <div class="card-body">
+                                <canvas id="seasonal-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Forecast Card -->
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">90-Day Forecast</div>
+                            <div class="card-body">
+                                <canvas id="forecast-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Raw Analysis Content -->
+            <div id="raw-analysis" class="mt-4"></div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const generateAnalysisBtn = document.getElementById('generate-analysis');
+    const generateStatementBtn = document.getElementById('generate-cashflow-statement');
+    const loadingIndicator = document.getElementById('loading');
+    const analysisDashboard = document.getElementById('analysis-dashboard');
+    const rawAnalysis = document.getElementById('raw-analysis');
+
+    generateAnalysisBtn.addEventListener('click', async function() {
+        try {
+            loadingIndicator.style.display = 'block';
+            const response = await fetch('/forecast');
+            const data = await response.json();
+            
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            // Display the dashboard
+            analysisDashboard.style.display = 'block';
+            
+            // Update pattern recognition
+            document.getElementById('pattern-recognition-content').innerHTML = data.ai_analysis;
+            
+            // Update risk assessment
+            document.getElementById('risk-assessment-content').innerHTML = 
+                `<p>Liquidity Ratio: ${data.risk_metrics.liquidity_ratio.toFixed(2)}</p>
+                 <p>Cash Runway: ${data.risk_metrics.runway_months.toFixed(1)} months</p>`;
+
+            // Create charts
+            createSeasonalChart(data.patterns.seasonal_pattern);
+            createForecastChart(data.forecasts);
+
+        } catch (error) {
+            console.error('Error:', error);
+            rawAnalysis.innerHTML = `<div class="alert alert-danger">Error generating analysis: ${error.message}</div>`;
+        } finally {
+            loadingIndicator.style.display = 'none';
+        }
+    });
+
+    generateStatementBtn.addEventListener('click', async function() {
+        try {
+            loadingIndicator.style.display = 'block';
+            window.location.href = '/generate_cashflow_statement';
+        } catch (error) {
+            console.error('Error:', error);
+            rawAnalysis.innerHTML = `<div class="alert alert-danger">Error generating statement: ${error.message}</div>`;
+        } finally {
+            loadingIndicator.style.display = 'none';
+        }
+    });
+
+    function createSeasonalChart(seasonalData) {
+        const ctx = document.getElementById('seasonal-chart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: seasonalData.length}, (_, i) => `Month ${i + 1}`),
+                datasets: [{
+                    label: 'Seasonal Pattern',
+                    data: seasonalData,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    function createForecastChart(forecasts) {
+        const ctx = document.getElementById('forecast-chart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: forecasts['90_days'].length}, (_, i) => `Day ${i + 1}`),
+                datasets: [{
+                    label: '90-Day Forecast',
+                    data: forecasts['90_days'],
+                    borderColor: 'rgb(153, 102, 255)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %} 

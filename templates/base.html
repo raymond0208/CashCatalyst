@@ -8,6 +8,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='1.1') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% block head %}{% endblock %}
 </head>
 <body class="app-theme1">
     <div class="app-container">
@@ -47,19 +49,21 @@
                         <i class="fas fa-home"></i>
                         <span>Home</span>
                     </a>
-                    {% if user_preferences and 'analytics' in user_preferences.modules %}
-                    <a href="#" class="menu-item">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Analytics</span>
+                    <a href="{{ url_for('cash_overview') }}" class="menu-item {% if request.endpoint == 'cash_overview' %}active{% endif %}">
+                        <i class="fas fa-wallet"></i>
+                        <span>Cash Overview</span>
                     </a>
-                    {% endif %}
+                    <a href="{{ url_for('cash_activities') }}" class="menu-item {% if request.endpoint == 'cash_activities' %}active{% endif %}">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>Cash Activities</span>
+                    </a>
                     {% if user_preferences and 'ai_analysis' in user_preferences.modules %}
-                    <a href="#" class="menu-item">
+                    <a href="{{ url_for('ai_analysis') }}" class="menu-item {% if request.endpoint == 'ai_analysis' %}active{% endif %}">
                         <i class="fas fa-robot"></i>
                         <span>AI Analysis</span>
                     </a>
                     {% endif %}
-                    <a href="#" class="menu-item">
+                    <a href="{{ url_for('upload_route') }}" class="menu-item {% if request.endpoint == 'upload_route' %}active{% endif %}">
                         <i class="fas fa-upload"></i>
                         <span>Upload</span>
                     </a>

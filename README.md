@@ -1,84 +1,142 @@
-![alt text](static/images/cashcatalyst-logo-inspired.svg)
-# &#x1F3E6; CashCatalyst: AI-Powered Cash Flow Management 🚀💰
+# CashCatalyst - Cash Flow Management System
 
-## 🌟 Revolutionize Your Business Finance
-For individuals or lean teams managing the finances of a business, cash flow is fundamental and has the most direct and CashCatalyst is your ultimate companion for mastering cash flow management. Whether you're an entrepreneur, small business owner, or part of a lean finance team, our tool harnesses cutting-edge AI to transform the way you handle your business's lifeblood - cash.
+CashCatalyst is a modern web application for tracking and analyzing cash flow, built with Flask and modern web technologies. It provides comprehensive tools for managing transactions, analyzing cash flow patterns, and generating financial insights.
 
-## 🎯 Why CashCatalyst?
+## Features
 
-AI-Driven Insights: Get expert analysis and predictions for your cash flow scenarios.
-Automatic Reporting: Generate professional cash flow statements with a click.
-User-Friendly Interface: Easily record and manage your cash activities.
-Collaborative: Share and work together with your team seamlessly.
+### 1. User Management
+- Secure user authentication system
+- Personalized dashboards for each user
+- User preferences and settings management
+- Profile customization options
 
-## &#10024; Core Features
-1. 🤖 **AI Analysis:** Get deep insights into your cash flow patterns and trends.  
-2. 📊 **Auto-Generated Statements:** Create finance-ready cash flow reports instantly.  
-3. 📝 **Easy Data Entry:** Record cash activities quickly and effortlessly.  
-4. 💼 **Financial Overview:** View your cash flow summary from a professional finance perspective.  
-5. 🔮 **Balance Forecasting:** Check current balances and predict future cash positions.  
-6. 🤝 **Team Collaboration:** Share data and insights with your team members.  
+### 2. Cash Flow Overview
+![Cash Overview](screenshots/cash_overview.png)
+- Real-time cash balance tracking
+- Breakdown of cash flows by category:
+  - Cash Flow from Operations (CFO)
+  - Cash Flow from Investments (CFI)
+  - Cash Flow from Financing (CFF)
+- Monthly balance trend visualization
+- Initial balance management
 
-## &#128640; Quick Start
-### 1. Clone the repository
+### 3. Transaction Management
+![Cash Activities](screenshots/cash_activities.png)
+- Record and track individual transactions
+- Categorize transactions by type
+- Filter and search functionality
+- Pagination for better performance
+- Edit and delete transactions
+- Balance calculation by date
 
+### 4. AI-Powered Analysis
+![AI Analysis](screenshots/ai_analysis.png)
+- Advanced financial pattern recognition
+- Risk assessment metrics
+- Seasonal trend analysis
+- 90-day cash flow forecasting
+- Automated cash flow statement generation
+
+### 5. Data Import/Export
+- Upload transactions from CSV/Excel files
+- Export transactions to CSV/Excel
+- Bulk transaction processing
+- Data validation and preview
+
+## Technology Stack
+
+- **Backend**: Python Flask
+- **Database**: SQLite with SQLAlchemy ORM
+- **Frontend**: HTML5, CSS3, JavaScript
+- **UI Framework**: Bootstrap 5
+- **Charts**: Chart.js
+- **Icons**: Font Awesome
+- **Data Processing**: Pandas, NumPy
+- **Visualization**: Matplotlib
+
+## Installation
+
+1. Clone the repository:
 ```bash
-git clone https://github.com/raymond0208/CashCatalyst.git
-cd CashCatalyst
+git clone https://github.com/yourusername/cashcatalyst.git
+cd cashcatalyst
 ```
 
-### 2. Set Up Your Environment
+2. Create and activate a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-```sh
-python -m venv cashcatalyst_env
-source cashcatalyst_env/bin/activate  # On Windows use `cashcatalyst_env\Scripts\activate`
+3. Install dependencies:
+```bash
 pip install -r requirements.txt
 ```
 
-### 3. Configure AI Magic
-Create a `.env` file in the project root and add your Anthropic API key:
-
-```sh
-ANTHROPIC_API_KEY=your_api_key_here
+4. Initialize the database:
+```bash
+flask db init
+flask db migrate
+flask db upgrade
 ```
 
-### 4. Launch CashCatalyst
-```sh
-python3 main.py or python main.py
+5. Run the application:
+```bash
+flask run
 ```
 
-### 5. Access Your Financial Command Center
+The application will be available at `http://localhost:5000`
 
-Open your browser and navigate to `http://127.0.0.1:5000/`
+## Usage
 
+1. **Registration/Login**
+   - Create a new account or login with existing credentials
+   - Customize your profile settings
 
-### 6. Open console
-1. Open browser type `http://127.0.0.1:5000/` the default local address or your custom address
+2. **Cash Overview**
+   - View your current cash position
+   - Set initial balance
+   - Monitor cash flow trends
+   - View monthly balance chart
 
-## &#128161; User Guide Highlights
-* **Secure Login:** Start by creating your account or logging in.  
-* **Initial Setup:** Set your starting cash balance.  
-* **Record Transactions:** Easily input cash activities through the intuitive interface.  
-* **Data Import:** Upload existing cash flow data in CSV or Excel formats.  
-* **Powerful Insights:** Use the AI tab for in-depth analysis and forecasting.  
-* **Export & Share:** Download your data for offline use or team collaboration.  
+3. **Cash Activities**
+   - Add new transactions
+   - View transaction history
+   - Calculate balance by date
+   - Edit or delete transactions
 
-## 📸 CashCatalyst in Action
+4. **AI Analysis**
+   - Generate advanced financial analysis
+   - View cash flow patterns
+   - Check risk metrics
+   - Download cash flow statements
 
-![alt text](static/images/loginpage.png)  
-*Secure access to financial data*
+5. **Data Management**
+   - Import transactions from files
+   - Export data for reporting
+   - Manage transaction categories
 
+## Security Features
 
-![alt text](static/images/transactiontable.png)  
-*Easily manage your cash transactions*
+- Password hashing using Werkzeug
+- User session management
+- CSRF protection
+- Secure form handling
+- User-specific data isolation
 
+## Contributing
 
-![alt text](static/images/ai-analysis.png)
-*Get AI-powered insights for smarter financial decisions*
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
-## 🤝 Support and Feedback
-We're constantly improving CashCatalyst. If you have any questions, suggestions, or encounter any issues, please open an issue on our GitHub repository. Your feedback is invaluable!
+## License
 
+This project is licensed under the Apache-2.0 license License - see the LICENSE file for details.
+
+## Acknowledgments
 
 ## ❤️ Stargazers
 [![Stargazers repo roster for @raymond0208/CashCatalyst](https://reporoster.com/stars/raymond0208/CashCatalyst)](https://github.com/raymond0208/CashCatalyst/stargazers)

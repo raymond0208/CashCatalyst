@@ -10,14 +10,20 @@ class User(UserMixin, db.Model):
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', name='fk_transaction_user'), nullable=False)
     date = db.Column(db.String(10), nullable=False)
     description = db.Column(db.String(100), nullable=False)
     amount = db.Column(db.Float, nullable=False)
     type = db.Column(db.String(10), nullable=False)
+    
+    user = db.relationship('User', backref=db.backref('transactions', lazy=True))
 
 class InitialBalance(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', name='fk_initial_balance_user'), nullable=False)
     balance = db.Column(db.Float, nullable=False)
+    
+    user = db.relationship('User', backref=db.backref('initial_balance', lazy=True))
 
 class UserPreferences(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -44,8 +44,9 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 with app.app_context():
+    # Create tables only if they don't exist
     db.create_all()
-    
+
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
@@ -66,6 +67,7 @@ def home():
     if request.method == 'POST':
         # Handle adding transactions
         new_transaction = Transaction(
+            user_id=current_user.id,
             date=request.form.get('date'),
             description=request.form.get('description'),
             amount=float(request.form.get('amount')),
@@ -76,9 +78,12 @@ def home():
         flash('Transaction added successfully', 'success')
         return redirect(url_for('home'))
 
-    paginated_transactions = Transaction.query.order_by(Transaction.date.desc()).paginate(page=page, per_page=per_page)
-    all_transactions = Transaction.query.all()
-    initial_balance_record = InitialBalance.query.first()
+    # Filter transactions by current user
+    paginated_transactions = Transaction.query.filter_by(user_id=current_user.id).order_by(Transaction.date.desc()).paginate(page=page, per_page=per_page)
+    all_transactions = Transaction.query.filter_by(user_id=current_user.id).all()
+    
+    # Get initial balance for current user
+    initial_balance_record = InitialBalance.query.filter_by(user_id=current_user.id).first()
     initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
 
     total_cfo, total_cfi, total_cff = calculate_totals(all_transactions)
@@ -174,16 +179,25 @@ def upload_route():
 @app.route('/set-initial-balance', methods=['POST'])
 @login_required
 def set_initial_balance():
-    initial_balance_value = float(request.form.get('initial_balance'))
-    initial_balance_record = InitialBalance.query.first()
-    if initial_balance_record:
-        initial_balance_record.balance = initial_balance_value
-    else:
-        initial_balance_record = InitialBalance(balance=initial_balance_value)
-        db.session.add(initial_balance_record)
-    db.session.commit()
-    flash('Initial balance set successfully', 'success')
-    return redirect(url_for('home'))
+    try:
+        amount = float(request.form.get('initial_balance'))
+        
+        # Get or create initial balance record for the user
+        initial_balance = InitialBalance.query.filter_by(user_id=current_user.id).first()
+        if initial_balance:
+            initial_balance.balance = amount
+        else:
+            initial_balance = InitialBalance(user_id=current_user.id, balance=amount)
+            db.session.add(initial_balance)
+            
+        db.session.commit()
+        flash('Initial balance set successfully', 'success')
+    except ValueError:
+        flash('Please enter a valid number for the initial balance', 'danger')
+    except Exception as e:
+        flash(f'Error setting initial balance: {str(e)}', 'danger')
+        
+    return redirect(url_for('cash_overview'))
 
 @app.route('/export/<file_type>')
 @login_required
@@ -221,6 +235,7 @@ def save_transactions():
     try:
         for item in data:
             new_transaction = Transaction(
+                user_id=current_user.id,
                 date=item['date'],
                 description=item['description'],
                 amount=float(item['amount']),
@@ -231,206 +246,175 @@ def save_transactions():
         return jsonify({'message': 'Transactions saved successfully'})
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500 
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/balance-by-date', methods=['POST'])
 @login_required
 def balance_by_date():
-    input_date = request.form.get('date')
-    transactions = Transaction.query.filter(Transaction.date <= input_date).all()
-    initial_balance_record = InitialBalance.query.first()
-    initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
-    total_cfo, total_cfi, total_cff = calculate_totals(transactions)
-    balance_sum = initial_balance + total_cfo + total_cfi + total_cff
-    return jsonify({
-        'input_date': input_date,
-        'balance_sum': balance_sum
-    })
+    try:
+        date_str = request.form.get('date')
+        target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        
+        # Get initial balance
+        initial_balance = InitialBalance.query.filter_by(user_id=current_user.id).first()
+        initial_amount = initial_balance.balance if initial_balance else 0
+        
+        # Get all transactions up to the target date
+        transactions = Transaction.query.filter(
+            Transaction.user_id == current_user.id,
+            Transaction.date <= target_date
+        ).all()
+        
+        # Calculate totals
+        total_cfo, total_cfi, total_cff = calculate_totals(transactions)
+        balance = initial_amount + total_cfo + total_cfi + total_cff
+        
+        return jsonify({
+            'success': True,
+            'balance': balance,
+            'date': date_str
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 400
     
 @app.route('/forecast', methods=['GET'])
 @login_required
 def forecast():
     try:
-        # Get transaction data
-        transactions = Transaction.query.order_by(Transaction.date).all()
+        # Get all transactions for the current user
+        transactions = Transaction.query.filter_by(user_id=current_user.id).order_by(Transaction.date).all()
+        
         if not transactions:
-            return jsonify({'error': 'No transaction data available'}), 400
-
-        initial_balance_record = InitialBalance.query.first()
-        initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
-
-        # Calculate current balance and totals
-        total_cfo, total_cfi, total_cff = calculate_totals(transactions)
-        current_balance = initial_balance + total_cfo + total_cfi + total_cff
-
-        # Format transaction history for analysis
-        transaction_history = [
-            {
-                'date': t.date.strftime('%Y-%m-%d') if isinstance(t.date, datetime) else t.date,
-                'amount': float(t.amount),
-                'type': t.type
-            } for t in transactions
-        ]
-
-        # Mock working capital data
-        working_capital = {
-            'current_assets': current_balance if current_balance > 0 else 0,
-            'current_liabilities': abs(current_balance) if current_balance < 0 else 0,
-            'cash': current_balance if current_balance > 0 else 0
-        }
-
-        # Initialize FinancialAnalytics and generate analysis
-        api_key = current_app.config.get('ANTHROPIC_API_KEY')
-        if not api_key:
-            return jsonify({'error': 'API key not configured'}), 500
-
-        analytics = FinancialAnalytics(api_key)
-        analysis_result = analytics.generate_advanced_financial_analysis(
-            initial_balance=initial_balance,
-            current_balance=current_balance,
-            transaction_history=transaction_history,
-            working_capital=working_capital
-        )
-
-        return jsonify(analysis_result)
-
-    except ValueError as ve:
-        app.logger.error(f"Configuration error: {str(ve)}")
-        return jsonify({'error': str(ve)}), 500
+            return jsonify({
+                'error': 'No transactions found. Please add some transactions first.'
+            }), 400
+            
+        # Convert transactions to a format suitable for analysis
+        transaction_data = [{
+            'date': t.date.strftime('%Y-%m-%d'),
+            'amount': t.amount,
+            'type': t.type,
+            'description': t.description
+        } for t in transactions]
+        
+        # Initialize financial analytics
+        analytics = FinancialAnalytics()
+        
+        # Get analysis results
+        analysis_results = analytics.analyze_transactions(transaction_data)
+        
+        # Calculate risk metrics
+        total_inflow = sum(t.amount for t in transactions if t.amount > 0)
+        total_outflow = abs(sum(t.amount for t in transactions if t.amount < 0))
+        liquidity_ratio = total_inflow / total_outflow if total_outflow != 0 else 0
+        
+        # Calculate runway (in months) based on average monthly burn rate
+        monthly_burn = total_outflow / max(1, (transactions[-1].date - transactions[0].date).days / 30)
+        current_balance = sum(t.amount for t in transactions)
+        runway_months = current_balance / monthly_burn if monthly_burn != 0 else 0
+        
+        return jsonify({
+            'success': True,
+            'ai_analysis': analysis_results.get('insights', 'No insights available'),
+            'patterns': {
+                'seasonal_pattern': analysis_results.get('seasonal_pattern', [0] * 12)  # 12 months
+            },
+            'forecasts': {
+                '90_days': analysis_results.get('forecast', [0] * 90)  # 90 days forecast
+            },
+            'risk_metrics': {
+                'liquidity_ratio': liquidity_ratio,
+                'runway_months': runway_months
+            }
+        })
     except Exception as e:
-        app.logger.error(f"Failed to generate analysis: {str(e)}")
-        app.logger.exception("Detailed traceback:")
-        return jsonify({'error': 'Failed to generate analysis'}), 500
+        return jsonify({
+            'error': str(e)
+        }), 500
 
-@app.route('/generate_cashflow_statement', methods=['GET'])
+@app.route('/generate_cashflow_statement')
 @login_required
-def generate_cashflow_statement_route():
+def generate_cashflow_statement():
     try:
-        transactions = Transaction.query.order_by(Transaction.date).all()
+        # Get all transactions for the current user
+        transactions = Transaction.query.filter_by(user_id=current_user.id).order_by(Transaction.date).all()
+        
         if not transactions:
-            app.logger.warning("No transactions found when generating cash flow statement")
-            return jsonify({'error': 'No transactions found'}), 400
-
-        initial_balance_record = InitialBalance.query.first()
-        initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
-
-        start_date = transactions[0].date
-        end_date = transactions[-1].date
-
-        transaction_data = "\n".join([f"Date: {t.date}, Description: {t.description}, Amount: {t.amount}, Type: {t.type}" for t in transactions])
-
-        app.logger.info(f"Generating cash flow statement for period {start_date} to {end_date}")
+            flash('No transactions found to generate statement', 'warning')
+            return redirect(url_for('ai_analysis'))
         
-        statement_data,ending_balance = FinancialAnalytics.generate_cashflow_statement(initial_balance, start_date, end_date, transaction_data)
-        
-        if not statement_data:
-            app.logger.error("generate_cashflow_statement returned None")
-            return jsonify({'error': 'Failed to generate statement: No data returned'}), 500
-
-        app.logger.info("Cash flow statement generated sucessfully")
-        app.logger.debug(f"Statement data: {statement_data}")
-
-        app.logger.info("Cash flow statement generated successfully")
-        app.logger.debug(f"Statement data: {statement_data}")
-
-        # Create a new workbook and select the active sheet
+        # Create Excel workbook
         wb = Workbook()
         ws = wb.active
         ws.title = "Cash Flow Statement"
-
-        # Set column widths
-        ws.column_dimensions['A'].width = 40
-        ws.column_dimensions['B'].width = 15
-
-        # Add title
-        ws['A1'] = f"Cash Flow Statement - {start_date} to {end_date}"
-        ws['A1'].font = Font(bold=True, size=14)
-        ws.merge_cells('A1:B1')
-
+        
         # Add headers
-        headers = ['Category', 'Amount']
-        for col, header in enumerate(headers, start=1):
-            cell = ws.cell(row=3, column=col, value=header)
+        headers = ['Date', 'Description', 'Amount', 'Type', 'Category']
+        for col, header in enumerate(headers, 1):
+            cell = ws.cell(row=1, column=col)
+            cell.value = header
             cell.font = Font(bold=True)
-            cell.fill = PatternFill(start_color="D3D3D3", end_color="D3D3D3", fill_type="solid")
-
-        # Helper function to add a row with formatting
-        def add_row(row, category, amount, is_total=False, indent=0):
-            ws.cell(row=row, column=1, value=category).alignment = Alignment(indent=indent)
-            ws.cell(row=row, column=2, value=amount)
-            if is_total:
-                for col in range(1, 3):
-                    ws.cell(row=row, column=col).font = Font(bold=True)
-
-        # Add Beginning Cash Balance
-        row = 4
-        add_row(row, "Beginning Cash Balance", initial_balance, True)
-        row += 2
-
-        # Process and add data for each category
-        categories = ['CFO', 'CFI', 'CFF']
-        for category in categories:
-            ws.cell(row=row, column=1, value=f"Cash Flow from {'Operating' if category == 'CFO' else 'Investing' if category == 'CFI' else 'Financing'} Activities ({category})")
-            ws.cell(row=row, column=1).font = Font(bold=True)
-            ws.cell(row=row, column=1).fill = PatternFill(start_color="D3D3D3", end_color="D3D3D3", fill_type="solid")
-            row += 1
-
-            category_total = 0
-            for item in statement_data:
-                if item['Category'] == category:
-                    add_row(row, item['Subcategory'], item['Amount'], indent=1)
-                    category_total += item['Amount']
-                    row += 1
-
-            add_row(row, f"Net Cash from {'Operating' if category == 'CFO' else 'Investing' if category == 'CFI' else 'Financing'}", category_total, True)
-            row += 2
-
-        # Add Total Net Cash Flow
-        total_net_cash_flow = sum(item['Amount'] for item in statement_data)
-        add_row(row, "Total Net Cash Flow", total_net_cash_flow, True)
-        row += 2
-
-        # Add Ending Cash Balance
-        ending_balance = initial_balance + total_net_cash_flow
-        add_row(row, "Ending Cash Balance", ending_balance, True)
-
-        # Apply currency formatting to amount column
-        for row in ws['B4:B' + str(ws.max_row)]:
-            for cell in row:
-                cell.number_format = '#,##0.00'
-
-        # Apply right alignment to amount column
-        for row in ws['B1:B' + str(ws.max_row)]:
-            for cell in row:
-                cell.alignment = Alignment(horizontal='right')
-
-        # Add borders
-        thin_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
-        for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=2):
-            for cell in row:
-                cell.border = thin_border
-
-        # Save to BytesIO object
-        output = BytesIO()
-        wb.save(output)
-        output.seek(0)
-
-        app.logger.info("Excel file created successfully")
+            cell.fill = PatternFill(start_color="CCCCCC", end_color="CCCCCC", fill_type="solid")
+        
+        # Add transactions
+        for row, t in enumerate(transactions, 2):
+            ws.cell(row=row, column=1, value=t.date.strftime('%Y-%m-%d'))
+            ws.cell(row=row, column=2, value=t.description)
+            ws.cell(row=row, column=3, value=t.amount)
+            ws.cell(row=row, column=4, value=t.type)
+            
+            # Determine category based on type
+            if 'cfo' in t.type.lower():
+                category = 'Operating'
+            elif 'cfi' in t.type.lower():
+                category = 'Investing'
+            else:
+                category = 'Financing'
+            ws.cell(row=row, column=5, value=category)
+        
+        # Add totals
+        total_row = len(transactions) + 3
+        ws.cell(row=total_row, column=1, value='Totals')
+        ws.cell(row=total_row, column=1).font = Font(bold=True)
+        
+        # Calculate and add category totals
+        categories = ['Operating', 'Investing', 'Financing']
+        for col, category in enumerate(categories, 3):
+            total = sum(t.amount for t in transactions if category.lower() in t.type.lower())
+            cell = ws.cell(row=total_row, column=col)
+            cell.value = total
+            cell.font = Font(bold=True)
+        
+        # Auto-adjust column widths
+        for col in range(1, 6):
+            ws.column_dimensions[get_column_letter(col)].auto_size = True
+        
+        # Save to BytesIO
+        excel_file = BytesIO()
+        wb.save(excel_file)
+        excel_file.seek(0)
+        
         return send_file(
-            output,
+            excel_file,
             mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             as_attachment=True,
             download_name='cash_flow_statement.xlsx'
         )
+        
     except Exception as e:
-        app.logger.error(f"Failed to generate cash flow statement: {str(e)}")
-        app.logger.error(traceback.format_exc())
-        return jsonify({'error': f'Failed to generate cash flow statement: {str(e)}'}), 500
-    
+        flash(f'Error generating statement: {str(e)}', 'danger')
+        return redirect(url_for('ai_analysis'))
+
 # Generate monthly chart function    
 def generate_monthly_balance_chart():
-    transactions = Transaction.query.order_by(Transaction.date).all()
-    initial_balance_record = InitialBalance.query.first()
+    # Get transactions for the current user
+    transactions = Transaction.query.filter_by(user_id=current_user.id).order_by(Transaction.date).all()
+    
+    # Get initial balance for the current user
+    initial_balance_record = InitialBalance.query.filter_by(user_id=current_user.id).first()
     initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
 
     monthly_balances = []
@@ -438,7 +422,7 @@ def generate_monthly_balance_chart():
     current_month = None
 
     for transaction in transactions:
-        transaction_date = datetime.strptime(transaction.date, '%Y-%m-%d').date()
+        transaction_date = transaction.date if isinstance(transaction.date, datetime) else datetime.strptime(transaction.date, '%Y-%m-%d')
         
         if current_month != transaction_date.replace(day=1):
             if current_month:
@@ -462,22 +446,35 @@ def generate_monthly_balance_chart():
     # Create the chart
     fig = Figure(figsize=(12, 6))
     axis = fig.add_subplot(1, 1, 1)
-    dates = [balance['date'] for balance in monthly_balances]
-    balances = [balance['balance'] for balance in monthly_balances]
-    axis.plot(dates, balances, marker='o')  # Added markers for each data point
+    
+    if monthly_balances:
+        dates = [balance['date'] for balance in monthly_balances]
+        balances = [balance['balance'] for balance in monthly_balances]
+        axis.plot(dates, balances, marker='o')  # Added markers for each data point
 
-    # Improve Y-axis formatting
-    def currency_formatter(x, p):
-        return f'${x:,.0f}'
-    
-    axis.yaxis.set_major_formatter(ticker.FuncFormatter(currency_formatter))
-    
-    # Adjust Y-axis ticks for better readability
-    axis.yaxis.set_major_locator(ticker.MaxNLocator(nbins=10, integer=True))
-    
-    # Format X-axis to show dates nicely
-    axis.xaxis.set_major_locator(MonthLocator())
-    axis.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
+        # Improve Y-axis formatting
+        def currency_formatter(x, p):
+            return f'${x:,.0f}'
+        
+        axis.yaxis.set_major_formatter(ticker.FuncFormatter(currency_formatter))
+        
+        # Adjust Y-axis ticks for better readability
+        axis.yaxis.set_major_locator(ticker.MaxNLocator(nbins=10, integer=True))
+        
+        # Format X-axis to show dates nicely
+        axis.xaxis.set_major_locator(MonthLocator())
+        axis.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
+        
+        # Add some padding to the y-axis
+        ylim = axis.get_ylim()
+        axis.set_ylim([ylim[0] - (ylim[1] - ylim[0]) * 0.1, ylim[1] + (ylim[1] - ylim[0]) * 0.1])
+    else:
+        # If no data, show a message on the chart
+        axis.text(0.5, 0.5, 'No transaction data available', 
+                 horizontalalignment='center', verticalalignment='center',
+                 transform=axis.transAxes, fontsize=14)
+        axis.set_xticks([])
+        axis.set_yticks([])
 
     axis.set_title('Monthly Balance', fontsize=16, fontweight='bold')
     axis.set_xlabel('Date', fontsize=12)
@@ -487,10 +484,6 @@ def generate_monthly_balance_chart():
     
     # Add gridlines for better readability
     axis.grid(True, linestyle='--', alpha=0.7)
-    
-    # Add some padding to the y-axis
-    ylim = axis.get_ylim()
-    axis.set_ylim([ylim[0] - (ylim[1] - ylim[0]) * 0.1, ylim[1] + (ylim[1] - ylim[0]) * 0.1])
 
     fig.tight_layout()
 
@@ -571,6 +564,66 @@ def utility_processor():
             return prefs
         return None
     return dict(user_preferences=get_user_preferences())
+
+@app.route('/cash-overview')
+@login_required
+def cash_overview():
+    # Get or create initial balance for the current user
+    initial_balance = InitialBalance.query.filter_by(user_id=current_user.id).first()
+    if not initial_balance:
+        initial_balance = InitialBalance(user_id=current_user.id, balance=0)
+        db.session.add(initial_balance)
+        db.session.commit()
+
+    # Get all transactions for the current user
+    transactions = Transaction.query.filter_by(user_id=current_user.id).all()
+    
+    # Calculate totals
+    total_cfo, total_cfi, total_cff = calculate_totals(transactions)
+    balance = initial_balance.balance + total_cfo + total_cfi + total_cff
+
+    return render_template('cash_overview.html', 
+                         initial_balance=initial_balance.balance,
+                         total_cfo=total_cfo, 
+                         total_cfi=total_cfi, 
+                         total_cff=total_cff, 
+                         balance=balance)
+
+@app.route('/cash-activities')
+@login_required
+def cash_activities():
+    page = request.args.get('page', 1, type=int)
+    per_page = 8
+    
+    # Get paginated transactions for the current user
+    paginated_transactions = Transaction.query.filter_by(user_id=current_user.id).order_by(Transaction.date.desc()).paginate(page=page, per_page=per_page)
+    
+    return render_template('cash_activities.html', transactions=paginated_transactions)
+
+@app.route('/ai-analysis')
+@login_required
+def ai_analysis():
+    return render_template('ai_analysis.html')
+
+@app.route('/create-transaction', methods=['POST'])
+@login_required
+def create_transaction():
+    try:
+        new_transaction = Transaction(
+            user_id=current_user.id,
+            date=request.form.get('date'),
+            description=request.form.get('description'),
+            amount=float(request.form.get('amount')),
+            type=request.form.get('type')
+        )
+        db.session.add(new_transaction)
+        db.session.commit()
+        flash('Transaction added successfully', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash('Error adding transaction: ' + str(e), 'danger')
+    
+    return redirect(url_for('cash_activities'))
 
 if __name__ == '__main__':
     app.run(debug=True)
