@@ -136,100 +136,78 @@ class FinancialAnalytics:
         return forecasts
 
     def generate_cashflow_statement(self, initial_balance, start_date, end_date, transaction_data):
-        api_key = current_app.config.get('ANTHROPIC_API_KEY')
-        
-        if not api_key:
-            raise ValueError("ANTHROPIC_API_KEY is not set in the application configuration")
-        
-        try:
-            anthropic = Anthropic(api_key=api_key)
-        except Exception as e:
-            raise ValueError(f"Failed to initialize Anthropic client: {str(e)}")
+        """Generate a cash flow statement with strict categorization and proper financial reporting structure."""
+        # Parse transaction data into a structured format
+        transactions = []
+        for line in transaction_data.split('\n'):
+            if line.strip():
+                parts = line.split(', ')
+                transaction = {}
+                for part in parts:
+                    key, value = part.split(': ', 1)
+                    transaction[key.lower()] = value
+                transactions.append(transaction)
 
-        prompt = f"""As a financial expert, generate a detailed cash flow statement based on the following data:
+        # Define the categorization structure exactly matching utils.py
+        categories = {
+            'CFO': {
+                'types': ["Cash-customer", "Salary-suppliers", "Income-tax", "Other-cfo"],
+                'items': []
+            },
+            'CFI': {
+                'types': ["Buy-property-equipments", "Sell-property-equipments", "Buy-investment", "Sell-investment", "Other-cfi"],
+                'items': []
+            },
+            'CFF': {
+                'types': ["Issue-shares", "borrowings", "Repay-borrowings", "Pay-dividends", "Interest-paid", "Other-cff"],
+                'items': []
+            }
+        }
 
-        Initial Balance: ${initial_balance}
-        Start Date: {start_date}
-        End Date: {end_date}
+        # Categorize transactions strictly by type
+        for t in transactions:
+            t_type = t['type']
+            t_amount = float(t['amount'])
+            t_date = t['date']
+            t_desc = t['description']
 
-        Transaction Data:
-        {transaction_data}
+            for category, info in categories.items():
+                if t_type in info['types']:
+                    info['items'].append({
+                        'type': t_type,
+                        'amount': t_amount,
+                        'date': t_date,
+                        'description': t_desc
+                    })
 
-        Please follow these strict categorization rules:
-        
-        Cash Flow from Operations (CFO):
-        - Cash from customers
-        - Salary and supplier payments
-        - Income tax payments
-        - Other operating activities
+        # Calculate totals
+        statement_data = []
+        category_totals = {'CFO': 0, 'CFI': 0, 'CFF': 0}
 
-        Cash Flow from Investing (CFI):
-        - Purchase/sale of property and equipment
-        - Purchase/sale of investments
-        - Other investing activities
+        # Process each category
+        for category, info in categories.items():
+            # Group transactions by type within each category
+            type_totals = {}
+            for item in info['items']:
+                t_type = item['type']
+                if t_type not in type_totals:
+                    type_totals[t_type] = 0
+                type_totals[t_type] += item['amount']
 
-        Cash Flow from Financing (CFF):
-        - Bank loans and repayments
-        - Interest payments
-        - Share issuance
-        - Dividend payments
-        - Other financing activities
+            # Add each type's total to the statement
+            for t_type, total in type_totals.items():
+                statement_data.append({
+                    'Category': category,
+                    'Subcategory': t_type,
+                    'Amount': total
+                })
+                category_totals[category] += total
 
-        Important: Salary and supplier payments MUST be categorized under CFO, not CFF.
+        # Calculate final totals
+        total_net_cash_flow = sum(category_totals.values())
+        ending_balance = initial_balance + total_net_cash_flow
 
-        Present the data in a clear, structured format. Use a simple list format with each item on a new line, like this:
-
-        CFO: Cash from customers: 1000
-        CFO: Payments to suppliers: -500
-        CFI: Purchase of equipment: -2000
-        CFF: Bank loan: 5000
-        CFF: Interest paid: -200
-        ...
-
-        After listing all items, provide the totals and ending balance in the same format:
-
-        Total CFO: 500
-        Total CFI: -2000
-        Total CFF: 4800
-        Overall Net Cash Flow: 3300
-        Ending Cash Balance: 4300
-
-        Ensure all calculations are accurate and consistent with the provided transaction data."""
-
-        try:
-            message = anthropic.messages.create(
-                model="claude-3-sonnet-20240229",
-                max_tokens=2000,
-                messages=[
-                    {"role": "user", "content": prompt}
-                ]
-            )
-            response = message.content[0].text
-
-            # Log the complete API response
-            current_app.logger.info(f"Complete API response:\n{response}")
-
-            # Parse the response
-            statement_data, totals = parse_response(response)
-
-            if not statement_data:
-                current_app.logger.error("Failed to parse API response")
-                return {'error': 'Parsing failed', 'raw_response': response}, None
-
-            # Calculate ending balance
-            ending_balance = totals.get('Ending Cash Balance')
-            if ending_balance is None:
-                ending_balance = initial_balance + totals.get('Overall Net Cash Flow', 0)
-
-            current_app.logger.info(f"Cash Flow Statement Calculation: {totals}")
-            current_app.logger.info(f"Ending Balance: {ending_balance}")
-
-            return statement_data, ending_balance
-
-        except Exception as e:
-            current_app.logger.error(f"Error generating cash flow statement: {str(e)}")
-            current_app.logger.error(f"Error details: {type(e).__name__}, {str(e)}")
-            raise
+        return statement_data, ending_balance
 
 def parse_response(response):
     lines = response.strip().split('\n')
