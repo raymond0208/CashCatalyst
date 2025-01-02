@@ -44,7 +44,6 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 with app.app_context():
-    # Create tables only if they don't exist
     db.create_all()
 
 login_manager = LoginManager(app)
@@ -294,41 +293,52 @@ def forecast():
             
         # Convert transactions to a format suitable for analysis
         transaction_data = [{
-            'date': t.date.strftime('%Y-%m-%d'),
+            'date': t.date.strftime('%Y-%m-%d') if isinstance(t.date, datetime) else t.date,
             'amount': t.amount,
             'type': t.type,
             'description': t.description
         } for t in transactions]
         
-        # Initialize financial analytics
-        analytics = FinancialAnalytics()
+        # Initialize financial analytics with API key
+        api_key = os.getenv('ANTHROPIC_API_KEY')
+        if not api_key:
+            return jsonify({
+                'error': 'API key not found. Please set the ANTHROPIC_API_KEY environment variable.'
+            }), 500
+            
+        analytics = FinancialAnalytics(api_key=api_key)
         
-        # Get analysis results
-        analysis_results = analytics.analyze_transactions(transaction_data)
+        # Get initial balance
+        initial_balance_record = InitialBalance.query.filter_by(user_id=current_user.id).first()
+        initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
         
-        # Calculate risk metrics
-        total_inflow = sum(t.amount for t in transactions if t.amount > 0)
-        total_outflow = abs(sum(t.amount for t in transactions if t.amount < 0))
-        liquidity_ratio = total_inflow / total_outflow if total_outflow != 0 else 0
+        # Calculate current balance
+        current_balance = initial_balance + sum(t.amount for t in transactions)
         
-        # Calculate runway (in months) based on average monthly burn rate
-        monthly_burn = total_outflow / max(1, (transactions[-1].date - transactions[0].date).days / 30)
-        current_balance = sum(t.amount for t in transactions)
-        runway_months = current_balance / monthly_burn if monthly_burn != 0 else 0
+        # Mock working capital data (you may want to replace this with actual data)
+        working_capital = {
+            'current_assets': current_balance,
+            'current_liabilities': 0,
+            'cash': current_balance
+        }
+        
+        # Get analysis results using the correct method
+        analysis_results = analytics.generate_advanced_financial_analysis(
+            initial_balance=initial_balance,
+            current_balance=current_balance,
+            transaction_history=transaction_data,
+            working_capital=working_capital
+        )
         
         return jsonify({
             'success': True,
-            'ai_analysis': analysis_results.get('insights', 'No insights available'),
-            'patterns': {
-                'seasonal_pattern': analysis_results.get('seasonal_pattern', [0] * 12)  # 12 months
-            },
-            'forecasts': {
-                '90_days': analysis_results.get('forecast', [0] * 90)  # 90 days forecast
-            },
-            'risk_metrics': {
-                'liquidity_ratio': liquidity_ratio,
-                'runway_months': runway_months
-            }
+            'ai_analysis': analysis_results.get('ai_analysis', 'No insights available'),
+            'patterns': analysis_results.get('patterns', {'seasonal_pattern': [0] * 12}),
+            'forecasts': analysis_results.get('forecasts', {'90_days': [0] * 90}),
+            'risk_metrics': analysis_results.get('risk_metrics', {
+                'liquidity_ratio': 0,
+                'runway_months': 0
+            })
         })
     except Exception as e:
         return jsonify({
