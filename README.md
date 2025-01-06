@@ -78,9 +78,18 @@ flask db migrate
 flask db upgrade
 ```
 
-5. Run the application:
+5. Configure LLM API key
+Create a `.env` file in project root and add LLM API key(I'm using Anthropic key):
+
+```sh
+ANTHROPIC_API_KEY=your_api_key_here
+```
+
+5. Run the application(I'm using python3.11):
 ```bash
-flask run
+python3.11 main.py 
+or 
+python main.py
 ```
 
 The application will be available at `http://localhost:5000`
