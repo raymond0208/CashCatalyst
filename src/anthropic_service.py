@@ -36,6 +36,10 @@ class FinancialAnalytics:
         liquidity_ratio = (working_capital['current_assets'] / current_liabilities 
                           if current_liabilities > 0 else 9999.99)
         
+        # Calculate burn rate (average of negative cash flows)
+        negative_flows = [cf for cf in cash_flows if cf < 0]
+        burn_rate = float(abs(sum(negative_flows)) / len(cash_flows)) if negative_flows else 0
+        
         # Avoid division by zero for runway months
         min_cash_flow = min(cash_flows) if cash_flows else 0
         runway_months = (working_capital['cash'] / abs(min_cash_flow) 
@@ -44,7 +48,7 @@ class FinancialAnalytics:
         return {
             'liquidity_ratio': float(liquidity_ratio),
             'cash_flow_volatility': float(np.std(cash_flows) if cash_flows else 0),
-            'burn_rate': float(sum(cf for cf in cash_flows if cf < 0) / len(cash_flows) if cash_flows else 0),
+            'burn_rate': float(burn_rate),
             'runway_months': float(runway_months)
         }
 

@@ -113,10 +113,14 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('pattern-recognition-content').innerHTML = data.ai_analysis;
             
             // Update risk assessment
-            document.getElementById('risk-assessment-content').innerHTML = 
-                `<p>Liquidity Ratio: ${data.risk_metrics.liquidity_ratio.toFixed(2)}</p>
-                 <p>Cash Runway: ${data.risk_metrics.runway_months.toFixed(1)} months</p>`;
-
+            document.getElementById('risk-assessment-content').innerHTML = `
+                <ul class="list-unstyled">
+                    <li><strong>Liquidity Ratio:</strong> ${formatMetricValue(data.risk_metrics.liquidity_ratio)}</li>
+                    <li><strong>Cash Flow Volatility:</strong> ${formatMetricValue(data.risk_metrics.cash_flow_volatility, '$')}</li>
+                    <li><strong>Monthly Burn Rate:</strong> ${formatMetricValue(data.risk_metrics.burn_rate, '$')}/month</li>
+                    <li><strong>Cash Runway:</strong> ${formatMetricValue(data.risk_metrics.runway_months, '', 'months')}</li>
+                </ul>`;
+            
             // Create charts
             createSeasonalChart(data.patterns.seasonal_pattern);
             createForecastChart(data.forecasts);

@@ -533,19 +533,30 @@ function formatPatternAnalysis(patterns) {
 }
 
 function formatRiskMetrics(metrics) {
-    const formatNumber = (num) => {
-        if (num >= 9999) {
-            return '∞';
+    const formatNumber = (num, allowInfinity = false) => {
+        if (num === undefined || num === null || !isFinite(num)) {
+            return '0.00';
+        }
+        if (!allowInfinity && (num >= 9999 || num <= -9999)) {
+            return '0.00';
         }
         return num.toFixed(2);
+    };
+
+    const formatBurnRate = (rate) => {
+        if (rate === undefined || rate === null || !isFinite(rate)) {
+            return '0.00';
+        }
+        // Ensure burn rate is positive for display
+        return Math.abs(rate).toFixed(2);
     };
 
     return `
         <ul class="list-unstyled">
             <li><strong>Liquidity Ratio:</strong> ${formatNumber(metrics.liquidity_ratio)}</li>
             <li><strong>Cash Flow Volatility:</strong> $${formatNumber(metrics.cash_flow_volatility)}</li>
-            <li><strong>Burn Rate:</strong> $${formatNumber(metrics.burn_rate)}/month</li>
-            <li><strong>Cash Runway:</strong> ${formatNumber(metrics.runway_months)} months</li>
+            <li><strong>Burn Rate:</strong> $${formatBurnRate(metrics.burn_rate)}/month</li>
+            <li><strong>Cash Runway:</strong> ${formatNumber(metrics.runway_months, true)} months</li>
         </ul>
     `;
 }

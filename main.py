@@ -337,6 +337,8 @@ def forecast():
             'forecasts': analysis_results.get('forecasts', {'90_days': [0] * 90}),
             'risk_metrics': analysis_results.get('risk_metrics', {
                 'liquidity_ratio': 0,
+                'cash_flow_volatility': 0,
+                'burn_rate': 0,
                 'runway_months': 0
             })
         })
