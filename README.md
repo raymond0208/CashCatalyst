@@ -18,7 +18,7 @@ Collaborative: Share and work together with your team seamlessly.
 - Profile customization options
 
 ### 2. Cash Flow Overview
-![Cash Overview](screenshots/cash_overview.png)
+![Cash Overview](screenshots/cash_overview.jpg)
 - Real-time cash balance tracking
 - Breakdown of cash flows by category:
   - Cash Flow from Operations (CFO)
