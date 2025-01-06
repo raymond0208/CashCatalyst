@@ -85,7 +85,7 @@ Create a `.env` file in project root and add LLM API key(I'm using Anthropic key
 ANTHROPIC_API_KEY=your_api_key_here
 ```
 
-5. Run the application(I'm using python3.11):
+6. Run the application(I'm using python3.11):
 ```bash
 python3.11 main.py 
 or 
