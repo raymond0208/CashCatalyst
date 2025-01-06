@@ -447,13 +447,7 @@ function handleAuthForms() {
 
 function handleMonthlyBalanceChart() {
     console.log("Setting up monthly balance chart handler");
-    
-    // Check if we're on the cash overview page by looking for the chart container
-    const chartContainer = document.querySelector('.monthly-chart-section');
-    if (chartContainer) {
-        console.log("Found chart container, fetching monthly balances");
-        fetchMonthlyBalances();
-    }
+    fetchMonthlyBalances();
 }
 
 function fetchMonthlyBalances() {
@@ -465,18 +459,49 @@ function fetchMonthlyBalances() {
             }
             return response.json();
         })
-        .then(data => {
-            console.log("Received monthly balance data:", data);
-            if (data.error) {
-                throw new Error(data.error);
+        .then(response => {
+            if (!response.success) {
+                throw new Error(response.error || 'Failed to fetch data');
             }
-            const chartImg = document.getElementById('monthly-balance-chart');
-            if (chartImg) {
-                chartImg.src = data.chart_image;
-                console.log("Updated chart image source");
-            } else {
-                console.error("Chart image element not found");
+            
+            const data = response.data;
+            const existingChart = Chart.getChart('monthly-balance-chart');
+            if (existingChart) {
+                existingChart.destroy();
             }
+            
+            const ctx = document.getElementById('monthly-balance-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Monthly Balance',
+                        data: data.balances,
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: value => '$' + value.toLocaleString()
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: false
+                        }
+                    }
+                }
+            });
         })
         .catch(error => {
             console.error('Error fetching monthly balances:', error);
@@ -508,19 +533,30 @@ function formatPatternAnalysis(patterns) {
 }
 
 function formatRiskMetrics(metrics) {
-    const formatNumber = (num) => {
-        if (num >= 9999) {
-            return '∞';
+    const formatNumber = (num, allowInfinity = false) => {
+        if (num === undefined || num === null || !isFinite(num)) {
+            return '0.00';
+        }
+        if (!allowInfinity && (num >= 9999 || num <= -9999)) {
+            return '0.00';
         }
         return num.toFixed(2);
+    };
+
+    const formatBurnRate = (rate) => {
+        if (rate === undefined || rate === null || !isFinite(rate)) {
+            return '0.00';
+        }
+        // Ensure burn rate is positive for display
+        return Math.abs(rate).toFixed(2);
     };
 
     return `
         <ul class="list-unstyled">
             <li><strong>Liquidity Ratio:</strong> ${formatNumber(metrics.liquidity_ratio)}</li>
             <li><strong>Cash Flow Volatility:</strong> $${formatNumber(metrics.cash_flow_volatility)}</li>
-            <li><strong>Burn Rate:</strong> $${formatNumber(metrics.burn_rate)}/month</li>
-            <li><strong>Cash Runway:</strong> ${formatNumber(metrics.runway_months)} months</li>
+            <li><strong>Burn Rate:</strong> $${formatBurnRate(metrics.burn_rate)}/month</li>
+            <li><strong>Cash Runway:</strong> ${formatNumber(metrics.runway_months, true)} months</li>
         </ul>
     `;
 }
@@ -606,6 +642,159 @@ function updateForecastChart(forecasts) {
     });
 }
 
+function handleMonthlyIncomeExpense() {
+    fetch('/monthly-income-expense')
+        .then(response => response.json())
+        .then(response => {
+            if (!response.success) {
+                throw new Error(response.error || 'Failed to fetch data');
+            }
+            
+            const data = response.data;
+            
+            // Destroy existing charts if they exist
+            const existingIncomeChart = Chart.getChart('monthly-income-chart');
+            if (existingIncomeChart) {
+                existingIncomeChart.destroy();
+            }
+            
+            const existingExpenseChart = Chart.getChart('monthly-expense-chart');
+            if (existingExpenseChart) {
+                existingExpenseChart.destroy();
+            }
+            
+            // Create Income Chart
+            const incomeCtx = document.getElementById('monthly-income-chart').getContext('2d');
+            new Chart(incomeCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Monthly Income',
+                        data: data.income,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => '$' + value.toLocaleString()
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Create Expense Chart
+            const expenseCtx = document.getElementById('monthly-expense-chart').getContext('2d');
+            new Chart(expenseCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Monthly Expenses',
+                        data: data.expense,
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => '$' + value.toLocaleString()
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching monthly income/expense data:', error);
+        });
+}
+
+function handleCashoutCategories() {
+    fetch('/cashout-categories')
+        .then(response => response.json())
+        .then(response => {
+            if (!response.success) {
+                throw new Error(response.error || 'Failed to fetch data');
+            }
+            
+            const data = response.data;
+            const existingChart = Chart.getChart('cashout-categories-chart');
+            if (existingChart) {
+                existingChart.destroy();
+            }
+            
+            const ctx = document.getElementById('cashout-categories-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Cash-out Amount',
+                        data: data.amounts,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => '$' + value.toLocaleString()
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `$${value.toLocaleString()} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching cashout categories:', error);
+        });
+}
+
 // Main execution
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM fully loaded");
@@ -646,5 +835,12 @@ document.addEventListener('DOMContentLoaded', function() {
     handleFileUpload();
     handleEditTransaction();
     handleAuthForms();
-    handleMonthlyBalanceChart();
+
+    // Initialize all charts if we're on the cash overview page
+    const monthlyChartsSection = document.querySelector('.monthly-charts-section');
+    if (monthlyChartsSection) {
+        handleMonthlyBalanceChart();
+        handleMonthlyIncomeExpense();
+        handleCashoutCategories();
+    }
 });

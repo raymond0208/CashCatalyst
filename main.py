@@ -337,6 +337,8 @@ def forecast():
             'forecasts': analysis_results.get('forecasts', {'90_days': [0] * 90}),
             'risk_metrics': analysis_results.get('risk_metrics', {
                 'liquidity_ratio': 0,
+                'cash_flow_volatility': 0,
+                'burn_rate': 0,
                 'runway_months': 0
             })
         })
@@ -575,14 +577,34 @@ def generate_monthly_balance_chart():
 @login_required
 def monthly_balances():
     try:
-        app.logger.info("Starting to generate monthly balance chart")
-        chart_image = generate_monthly_balance_chart()
-        app.logger.info("Chart generated successfully")
-        return jsonify({'chart_image': chart_image})
+        app.logger.info("Starting to generate monthly balance data")
+        transactions = Transaction.query.filter_by(user_id=current_user.id).order_by(Transaction.date).all()
+        initial_balance_record = InitialBalance.query.filter_by(user_id=current_user.id).first()
+        initial_balance = initial_balance_record.balance if initial_balance_record else 0.0
+
+        monthly_data = {}
+        current_balance = initial_balance
+
+        for transaction in transactions:
+            month = transaction.date.strftime('%Y-%m') if isinstance(transaction.date, datetime) else datetime.strptime(transaction.date, '%Y-%m-%d').strftime('%Y-%m')
+            
+            if month not in monthly_data:
+                monthly_data[month] = current_balance
+            
+            current_balance += transaction.amount
+            monthly_data[month] = current_balance
+
+        app.logger.info(f"Monthly balance data generated: {monthly_data}")
+        return jsonify({
+            'success': True,
+            'data': {
+                'labels': list(monthly_data.keys()),
+                'balances': list(monthly_data.values())
+            }
+        })
     except Exception as e:
-        app.logger.error(f"Error generating monthly balance chart: {str(e)}")
-        app.logger.exception("Detailed traceback:")
-        return jsonify({'error': 'Failed to generate chart: ' + str(e)}), 500
+        app.logger.error(f"Error generating monthly balance data: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/settings')
 @login_required
@@ -697,6 +719,63 @@ def create_transaction():
         flash('Error adding transaction: ' + str(e), 'danger')
     
     return redirect(url_for('cash_activities'))
+
+@app.route('/monthly-income-expense', methods=['GET'])
+@login_required
+def monthly_income_expense():
+    try:
+        transactions = Transaction.query.filter_by(user_id=current_user.id).order_by(Transaction.date).all()
+        monthly_data = {}
+
+        for transaction in transactions:
+            month = transaction.date.strftime('%Y-%m') if isinstance(transaction.date, datetime) else datetime.strptime(transaction.date, '%Y-%m-%d').strftime('%Y-%m')
+            
+            if month not in monthly_data:
+                monthly_data[month] = {'income': 0, 'expense': 0}
+            
+            if transaction.amount > 0:
+                monthly_data[month]['income'] += transaction.amount
+            else:
+                monthly_data[month]['expense'] += abs(transaction.amount)
+
+        return jsonify({
+            'success': True,
+            'data': {
+                'labels': list(monthly_data.keys()),
+                'income': [data['income'] for data in monthly_data.values()],
+                'expense': [data['expense'] for data in monthly_data.values()]
+            }
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/cashout-categories', methods=['GET'])
+@login_required
+def cashout_categories():
+    try:
+        # Fix the filter syntax for negative amounts
+        transactions = Transaction.query.filter(
+            Transaction.user_id == current_user.id,
+            Transaction.amount < 0  # Correct syntax for filtering negative amounts
+        ).all()
+
+        categories_data = {}
+        for transaction in transactions:
+            category = transaction.type
+            if category not in categories_data:
+                categories_data[category] = 0
+            categories_data[category] += abs(transaction.amount)
+
+        return jsonify({
+            'success': True,
+            'data': {
+                'labels': list(categories_data.keys()),
+                'amounts': list(categories_data.values())
+            }
+        })
+    except Exception as e:
+        app.logger.error(f"Error fetching cashout categories: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
