@@ -71,11 +71,43 @@
         <div id="balance-by-date-result" class="mt-3"></div>
     </div>
 
-    <!-- Monthly Balance Chart Section -->
-    <div class="monthly-chart-section mt-4">
-        <h3>Monthly Balance Trend</h3>
-        <div class="chart-container">
-            <img id="monthly-balance-chart" class="img-fluid" alt="Monthly Balance Chart">
+    <!-- Monthly Charts Section -->
+    <div class="monthly-charts-section mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h3>Monthly Income</h3>
+                        <canvas id="monthly-income-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h3>Monthly Expenses</h3>
+                        <canvas id="monthly-expense-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h3>Monthly Balance Trend</h3>
+                        <canvas id="monthly-balance-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h3>Cash-out by Categories</h3>
+                        <canvas id="cashout-categories-chart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %} 
