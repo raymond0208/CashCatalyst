@@ -1,144 +1,63 @@
-# CashCatalyst: AI-Powered Cash Flow Management 🚀💰
+# Cash Flow Tracking System
 
-For individuals or lean teams managing the finances of a business, cash flow is fundamental and has the most direct and CashCatalyst is your ultimate companion for mastering cash flow management. Whether you're an entrepreneur, small business owner, or part of a lean finance team, our tool harnesses cutting-edge AI to transform the way you handle your business's lifeblood - cash.
-
-## 🎯 Why CashCatalyst?
-
-AI-Driven Insights: Get expert analysis and predictions for your cash flow scenarios.
-Automatic Reporting: Generate professional cash flow statements with a click.
-User-Friendly Interface: Easily record and manage your cash activities.
-Collaborative: Share and work together with your team seamlessly.
+A Flask-based cash flow tracking system with AI-powered analysis, designed for startups and small businesses.
 
 ## Features
 
-### 1. User Management
-- Secure user authentication system
-- Personalized dashboards for each user
-- User preferences and settings management
-- Profile customization options
-
-### 2. Cash Flow Overview
+- 🤖 AI-powered financial analysis and forecasting
+- 📊 Interactive charts and visualizations
+- 📥 Bulk transaction upload
+- 👥 Multi-user support
+- 💼 Business-oriented UI/UX
 ![Cash Overview](screenshots/cash_overview.jpg)
-- Real-time cash balance tracking
-- Breakdown of cash flows by category:
-  - Cash Flow from Operations (CFO)
-  - Cash Flow from Investments (CFI)
-  - Cash Flow from Financing (CFF)
-- Monthly balance trend visualization
-- Initial balance management
-
-### 3. Transaction Management
-![Cash Activities](screenshots/cash_activities.png)
-- Record and track individual transactions
-- Categorize transactions by type
-- Filter and search functionality
-- Pagination for better performance
-- Edit and delete transactions
-- Balance calculation by date
-
-### 4. AI-Powered Analysis
 ![AI Analysis](screenshots/ai_analysis.png)
-- Advanced financial pattern recognition
-- Risk assessment metrics
-- Seasonal trend analysis
-- 90-day cash flow forecasting
-- Automated cash flow statement generation
 
-### 5. Data Import/Export
-![Data Upload](screenshots/Data_upload.png)
-- Upload transactions from CSV/Excel files
-- Export transactions to CSV/Excel
-- Bulk transaction processing
-- Data validation and preview
+## Quick Start
 
+1. Clone the repository
+2. Install dependencies: `pip install -r requirements.txt`
+3. Set up environment variables
+4. Run migrations: `flask db upgrade`
+5. Start the server: `flask run`
 
-## Installation
+## Documentation
 
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/cashcatalyst.git
-cd cashcatalyst
-```
+For detailed instructions on installation, configuration, and usage, please refer to our:
 
-2. Create and activate a virtual environment:
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
+- [User Guide](doc/USER_GUIDE.md)
+- [API Documentation](doc/API.md)
+- [Development Guide](doc/DEVELOPMENT.md)
 
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+## Tech Stack
 
-4. Initialize the database:
-```bash
-flask db init
-flask db migrate
-flask db upgrade
-```
-
-5. Configure LLM API key
-Create a `.env` file in project root and add LLM API key(I'm using Anthropic key):
-
-```sh
-ANTHROPIC_API_KEY=your_api_key_here
-```
-
-6. Run the application(I'm using python3.11):
-```bash
-python3.11 main.py 
-or 
-python main.py
-```
-
-The application will be available at `http://localhost:5000`
-
-## Usage
-
-1. **Registration/Login**
-   - Create a new account or login with existing credentials
-   - Customize your profile settings
-
-2. **Cash Overview**
-   - View your current cash position
-   - Set initial balance
-   - Monitor cash flow trends
-   - View monthly balance chart
-
-3. **Cash Activities**
-   - Add new transactions
-   - View transaction history
-   - Calculate balance by date
-   - Edit or delete transactions
-
-4. **AI Analysis**
-   - Generate advanced financial analysis
-   - View cash flow patterns
-   - Check risk metrics
-   - Download cash flow statements
-
-5. **Data Management**
-   - Import transactions from files
-   - Export data for reporting
-   - Manage transaction categories
-
+- **Backend:** Flask, SQLAlchemy, Python 3.9+
+- **Frontend:** JavaScript, Chart.js, Bootstrap 5
+- **Database:** PostgreSQL/SQLite
+- **AI/ML:** Anthropic Claude API
+- **DevOps:** Docker, GitHub Actions
 
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch
+2. Create your feature branch
 3. Commit your changes
 4. Push to the branch
 5. Create a Pull Request
 
 ## License
 
-This project is licensed under the Apache-2.0 license License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Support
+
+For support, please:
+1. Check the [User Guide](doc/USER_GUIDE.md)
+2. Search [existing issues](https://github.com/yourusername/cash-flow-tracker/issues)
+3. Create a new issue if needed
 
 ## Acknowledgments
 
-## ❤️ Stargazers
-[![Stargazers repo roster for @raymond0208/CashCatalyst](https://reporoster.com/stars/raymond0208/CashCatalyst)](https://github.com/raymond0208/CashCatalyst/stargazers)
-## ❤️ Forkers
-[![Forkers repo roster for @raymond0208/CashCatalyst](https://reporoster.com/forks/raymond0208/CashCatalyst)](https://github.com/raymond0208/CashCatalyst/network/members)
+- Flask community
+- Chart.js team
+- Anthropic for AI capabilities
+- All contributors
