@@ -148,7 +148,6 @@ Cash flow represents the net amount of cash and cash equivalents moving in and o
    FLASK_ENV=development
    DATABASE_URL=postgresql://user:password@localhost/dbname
    ANTHROPIC_API_KEY=your_api_key_here
-   SECRET_KEY=your_secret_key
    ```
 
 5. Initialize database:
@@ -156,9 +155,9 @@ Cash flow represents the net amount of cash and cash equivalents moving in and o
    flask db upgrade
    ```
 
-6. Run the application:
+6. Run the application(Can use your own Python version, I'm using Python 3.11):
    ```bash
-   flask run
+   python3.11 main.py
    ```
 
 ## User Manual
@@ -324,4 +323,4 @@ A: CSV and Excel files using our template.
 
 ---
 
-Last updated: [2025.01.14]
+Last updated: [2025.02.26]

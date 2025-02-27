@@ -57,6 +57,56 @@
                 </div>
             </div>
         </div>
+        <!-- Burn Rate Section -->
+        <div class="row mt-3">
+            <div class="col">
+                <div class="balance-item">
+                    <h5>Monthly Burn Rate</h5>
+                    <p>${{ burn_rate|round(2) }}/month</p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="balance-item">
+                    <h5>Cash Runway</h5>
+                    <p>{% if runway_months > 36 %}
+                         >36 months
+                       {% else %}
+                         {{ runway_months|round(1) }} months
+                       {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- Runway Visualization -->
+        <div class="row mt-3">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Cash Runway Visualization</h5>
+                        <div class="progress">
+                            <div class="progress-bar 
+                                      {% if runway_months > 12 %}bg-success
+                                      {% elif runway_months > 6 %}bg-info
+                                      {% elif runway_months > 3 %}bg-warning
+                                      {% else %}bg-danger{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {% if runway_months > 18 %}100{% else %}{{ (runway_months / 18 * 100)|round(1) }}{% endif %}%" 
+                                 aria-valuenow="{{ runway_months }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="18">
+                                {% if runway_months > 36 %}>36{% else %}{{ runway_months|round(1) }}{% endif %} months
+                            </div>
+                        </div>
+                        <div class="mt-2 small text-muted d-flex justify-content-between">
+                            <span>0</span>
+                            <span>6</span>
+                            <span>12</span>
+                            <span>18+ months</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Balance by Date Section -->

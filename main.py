@@ -7,7 +7,7 @@ from src.models import db, User, Transaction, InitialBalance, UserPreferences
 from src.forms import LoginForm, RegistrationForm
 from src.anthropic_service import FinancialAnalytics
 from src.upload_handler import process_upload
-from src.utils import calculate_totals
+from src.utils import calculate_totals, calculate_burn_rate, calculate_runway
 from src.config import Config
 import pandas as pd
 from io import BytesIO
@@ -27,7 +27,7 @@ from datetime import datetime
 import calendar
 from flask_migrate import Migrate
 
-#load Anthropic LLM API key and other variables in .env
+# Load .env file explicitly at the start
 load_dotenv()
 
 # Ensure instance folder exists
@@ -677,12 +677,18 @@ def cash_overview():
     total_cfo, total_cfi, total_cff = calculate_totals(transactions)
     balance = initial_balance.balance + total_cfo + total_cfi + total_cff
 
+    # Calculate burn rate and runway
+    burn_rate = calculate_burn_rate(transactions)
+    runway_months = calculate_runway(balance, burn_rate)
+
     return render_template('cash_overview.html', 
                          initial_balance=initial_balance.balance,
                          total_cfo=total_cfo, 
                          total_cfi=total_cfi, 
                          total_cff=total_cff, 
-                         balance=balance)
+                         balance=balance,
+                         burn_rate=burn_rate,
+                         runway_months=runway_months)
 
 @app.route('/cash-activities')
 @login_required

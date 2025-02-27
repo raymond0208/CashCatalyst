@@ -99,6 +99,8 @@ class FinancialAnalytics:
             return analysis_result
         except Exception as e:
             current_app.logger.error(f"Analysis failed: {str(e)}")
+            import traceback
+            current_app.logger.error(f"Traceback: {traceback.format_exc()}")
             raise
     
     def generate_forecasts(self, transaction_history, patterns):
