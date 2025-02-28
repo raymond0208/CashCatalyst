@@ -1,6 +1,6 @@
-# Cash Flow Management Tool for Non-accounting/Non-finance Business User
+# CashCatalyst - Easy Cash Flow Management
 
-A AI-powered cash flow management system for business owner and user to record, monitor and analysis cashflow easily, designed for startups and small businesses.
+A cash flow tool for non-accounting, non-finance background business ownwers. This is an AI-powered cash flow management system to record, monitor and analysis cashflow and fiannce condition in understandable words, designed for startups and small businesses.
 
 ## Features
 
