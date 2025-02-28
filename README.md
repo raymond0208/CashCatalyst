@@ -1,6 +1,6 @@
-# Cash Flow Tracking System
+# Cash Flow Management Tool for Non-accounting/Non-finance Business User
 
-A Flask-based cash flow tracking system with AI-powered analysis, designed for startups and small businesses.
+A AI-powered cash flow management system for business owner and user to record, monitor and analysis cashflow easily, designed for startups and small businesses.
 
 ## Features
 
