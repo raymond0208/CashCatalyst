@@ -29,23 +29,29 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col">
-                <div class="balance-item">
-                    <h5>CFO (Cashflow from Operation)</h5>
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="balance-item position-relative">
+                    <h5>
+                        Cash From Business Operation
+                        <span class="info-icon" data-bs-toggle="tooltip" data-bs-html="true" 
+                              data-bs-title="Equivalent to CFO(Cashflow from Operation) in accounting.<br> CFO: ${{ total_cfo }}">
+                            <i class="fas fa-info-circle"></i>
+                        </span>
+                    </h5>
                     <p>${{ total_cfo }}</p>
                 </div>
             </div>
-            <div class="col">
-                <div class="balance-item">
-                    <h5>CFI (Cashflow from Investment)</h5>
-                    <p>${{ total_cfi }}</p>
-                </div>
-            </div>
-            <div class="col">
-                <div class="balance-item">
-                    <h5>CFF (Cashflow from Financing)</h5>
-                    <p>${{ total_cff }}</p>
+            <div class="col-md-6">
+                <div class="balance-item position-relative">
+                    <h5>
+                        Cash from Financing and Other Activities
+                        <span class="info-icon" data-bs-toggle="tooltip" data-bs-html="true" 
+                              data-bs-title="Equivalent to CFF(Cashflow from Financing) + CFI(Cashflow from Investment) in accounting.<br> CFF: ${{ total_cff }}&#10; <br> CFI: ${{ total_cfi }}">
+                            <i class="fas fa-info-circle"></i>
+                        </span>
+                    </h5>
+                    <p>${{ total_cfi + total_cff }}</p>
                 </div>
             </div>
         </div>

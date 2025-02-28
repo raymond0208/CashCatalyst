@@ -843,4 +843,12 @@ document.addEventListener('DOMContentLoaded', function() {
         handleMonthlyIncomeExpense();
         handleCashoutCategories();
     }
+
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl, {
+            html: true,
+            template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner text-start"></div></div>'
+        })
+    })
 });
