@@ -7,11 +7,13 @@ A cash flow tool for non-accounting, non-finance background business ownwers. Th
 - 💰 Quick overview of different aspects of your cashflow
 - 🤖 AI-powered financial analysis and forecasting
 - 📊 Interactive charts and visualizations
-- 📥 Bulk transaction upload
-- 👥 Multi-user support
+- 📥 Cash transaction records bulk upload by file
+- 👥 Multi-user support and authentication
 - 💼 Business-oriented UI/UX
 ![Cash Metrics](screenshots/cash_overview_metrics.png)
 ![Cash Overview](screenshots/cash_overview.jpg)
+![Cash Record](screenshots/cash_record.png)
+![Cash Bulk Upload](screenshots/record_file_upload.png)
 ![AI Analysis](screenshots/ai_analysis.png)
 
 ## Quick Start

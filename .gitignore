@@ -8,7 +8,7 @@ app_ref.py
 .webassets-cache
 
 # Virtual Environment
-venv312/
+venv311/
 venv/
 env/
 .venv/
