@@ -17,7 +17,7 @@ class Config:
     if not ANTHROPIC_API_KEY:
         print("WARNING: ANTHROPIC_API_KEY not found in environment variables")
     
-    UPLOAD_FOLDER = os.path.join(basedir, '..', 'uploads')
+    UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'uploads')
 
     # Enhanced debugging information
     print(f"Configuration initialized:")

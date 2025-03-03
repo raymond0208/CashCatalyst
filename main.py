@@ -34,6 +34,9 @@ load_dotenv()
 instance_path = os.path.join(os.path.dirname(__file__),'instance')
 os.makedirs(instance_path, exist_ok=True)
 
+upload_path = os.path.join(os.path.dirname(__file__), 'uploads')
+os.makedirs(upload_path, exist_ok=True)
+
 app = Flask(__name__,
             template_folder='templates',
             static_folder='static')
