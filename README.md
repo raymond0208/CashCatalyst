@@ -28,9 +28,7 @@ A cash flow tool for non-accounting, non-finance background business ownwers. Th
 For detailed instructions on installation, configuration, and usage, please refer to our:
 
 - [User Guide](doc/USER_GUIDE.md)
-- [API Documentation](doc/API.md)
 - [Cashflow bulk update template](sample-cashflow-worksheet.csv)
-- [Development Guide](doc/DEVELOPMENT.md)
 
 ## Tech Stack
 
