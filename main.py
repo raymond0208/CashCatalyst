@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file, current_app
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file, current_app, session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from typing_extensions import Annotated
@@ -26,6 +26,7 @@ import matplotlib.ticker as ticker
 from datetime import datetime
 import calendar
 from flask_migrate import Migrate
+from flask_babel import Babel
 
 # Load .env file explicitly at the start
 load_dotenv()
@@ -51,6 +52,37 @@ with app.app_context():
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+
+babel = Babel()
+
+def get_locale():
+    # Debug print
+    print(f"get_locale called, session: {session}")
+    
+    # First check if a language is stored in the session
+    if 'language' in session:
+        lang = session['language']
+        print(f"Using language from session: {lang}")
+        return lang
+        
+    # Otherwise fallback to browser preference
+    browser_lang = request.accept_languages.best_match(['en', 'es', 'ja'])
+    print(f"Using browser language: {browser_lang}")
+    return browser_lang
+
+# Initialize babel with the locale selector function
+babel.init_app(app, locale_selector=get_locale)
+
+@app.route('/set-language/<language>')
+def set_language(language):
+    # Store language in session
+    session['language'] = language
+    print(f"Setting language to: {language}")
+    print(f"Session contains: {session}")
+    # Debug response to confirm language setting
+    flash(f'Language set to: {language}', 'info')
+    # Redirect back to the referring page or home page
+    return redirect(request.referrer or url_for('home'))
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -785,6 +817,17 @@ def cashout_categories():
     except Exception as e:
         app.logger.error(f"Error fetching cashout categories: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/debug-language')
+def debug_language():
+    """Debug endpoint to check translations"""
+    all_info = {
+        'session_language': session.get('language', 'Not set'),
+        'available_translations': os.listdir('translations'),
+        'session_data': dict(session),
+        'best_match': request.accept_languages.best_match(['en', 'es', 'ja']),
+    }
+    return jsonify(all_info)
 
 if __name__ == '__main__':
     app.run(debug=True)

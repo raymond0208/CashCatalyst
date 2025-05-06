@@ -3,7 +3,7 @@
 {% block content %}
     <div class="content-header">
         <div class="breadcrumb-nav">
-            <span>Workspace</span> / <span>Dashboard</span>
+            <span>{{ _('Workspace') }}</span> / <span>{{ _('Dashboard') }}</span>
         </div>
     </div>
 
@@ -20,8 +20,8 @@
     {% endwith %}
 
     <div class="dashboard-welcome mt-4">
-        <h2>Welcome, {{ current_user.username }}!</h2>
-        <p class="text-muted">Manage and analyze your cash flow with ease</p>
+        <h2>{{ _('  Welcome') }}, {{ current_user.username }}!</h2>
+        <p class="text-muted">{{ _('Manage and analyze your cash flow with ease') }}</p>
     </div>
 
     <div class="quick-actions mt-4">
@@ -30,8 +30,8 @@
                 <a href="{{ url_for('cash_overview') }}" class="card action-card">
                     <div class="card-body">
                         <i class="fas fa-wallet fa-2x mb-3"></i>
-                        <h5>Cash Overview</h5>
-                        <p>View your cash flow summary</p>
+                        <h5>{{ _('Cash Overview') }}</h5>
+                        <p>{{ _('View your cash flow summary') }}</p>
                     </div>
                 </a>
             </div>
@@ -39,8 +39,8 @@
                 <a href="{{ url_for('cash_activities') }}" class="card action-card">
                     <div class="card-body">
                         <i class="fas fa-exchange-alt fa-2x mb-3"></i>
-                        <h5>Cash Activities</h5>
-                        <p>Track your transactions</p>
+                        <h5>{{ _('Cash Activities') }}</h5>
+                        <p>{{ _('Track your transactions') }}</p>
                     </div>
                 </a>
             </div>
@@ -48,8 +48,8 @@
                 <a href="{{ url_for('ai_analysis') }}" class="card action-card">
                     <div class="card-body">
                         <i class="fas fa-robot fa-2x mb-3"></i>
-                        <h5>AI Analysis</h5>
-                        <p>Get AI-powered insights</p>
+                        <h5>{{ _('AI Analysis') }}</h5>
+                        <p>{{ _('Get AI-powered insights') }}</p>
                     </div>
                 </a>
             </div>
@@ -57,8 +57,8 @@
                 <a href="{{ url_for('upload_route') }}" class="card action-card">
                     <div class="card-body">
                         <i class="fas fa-upload fa-2x mb-3"></i>
-                        <h5>Upload Data</h5>
-                        <p>Import your transactions</p>
+                        <h5>{{ _('Upload Data') }}</h5>
+                        <p>{{ _('Import your transactions') }}</p>
                     </div>
                 </a>
             </div>

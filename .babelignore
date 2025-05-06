@@ -1,0 +1,10 @@
+venv311/
+uploads/
+static/
+__pycache__/
+*.csv
+*.xlsx
+*.png
+*.jpg
+*.jpeg
+*.pdf

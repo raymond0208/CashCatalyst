@@ -401,6 +401,23 @@
     z-index: 1000;
 }
 
+/* Language selector styling */
+.language-selector {
+    margin-left: auto;
+    margin-right: 1rem;
+}
+
+.language-selector .btn {
+    color: white;
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.375rem 0.75rem;
+}
+
+.language-selector .btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
 .main-wrapper {
     display: flex;
     height: calc(100vh - 60px);

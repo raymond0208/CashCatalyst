@@ -10,6 +10,7 @@ A cash flow tool for non-accounting, non-finance background business ownwers. Th
 - 📥 Cash transaction records bulk upload by file
 - 👥 Multi-user support and authentication
 - 💼 Business-oriented UI/UX
+- 🌐 Multilingual support (English, Spanish, French, Japanese, Chinese)
 ![Cash Metrics](screenshots/cash_overview_metrics.png)
 ![Cash Overview](screenshots/cash_overview.jpg)
 ![Cash Record](screenshots/cash_record.png)
@@ -30,12 +31,23 @@ For detailed instructions on installation, configuration, and usage, please refe
 - [User Guide](doc/USER_GUIDE.md)
 - [Cashflow bulk update template](sample-cashflow-worksheet.csv)
 
+## Multilingual Support
+
+CashCatalyst now supports multiple languages:
+
+- English (en)
+- Spanish (es)
+- Japanese (ja)
+
+Users can switch languages using the language dropdown in the application header.
+
 ## Tech Stack
 
 - **Backend:** Flask, SQLAlchemy, Python 3.11+
 - **Frontend:** JavaScript, Chart.js, Bootstrap 5
 - **Database:** PostgreSQL/SQLite
 - **AI/ML:** Anthropic Claude API
+- **Internationalization:** Flask-Babel
 - **DevOps:** Docker, GitHub Actions
 
 ## Contributing

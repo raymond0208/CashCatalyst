@@ -1,0 +1,320 @@
+# Translations template for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-05-06 23:55+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: templates/ai_analysis.html:6 templates/cash_activities.html:6
+#: templates/cash_overview.html:6 templates/home.html:6 templates/upload.html:6
+msgid "Workspace"
+msgstr ""
+
+#: templates/ai_analysis.html:6 templates/base.html:73 templates/home.html:51
+msgid "AI Analysis"
+msgstr ""
+
+#: templates/ai_analysis.html:23
+msgid "AI Financial Analysis"
+msgstr ""
+
+#: templates/ai_analysis.html:27
+msgid "Generate Advanced Analysis"
+msgstr ""
+
+#: templates/ai_analysis.html:28
+msgid "Generate Cash Flow Statement"
+msgstr ""
+
+#: templates/ai_analysis.html:30
+msgid ""
+"Note: The cash flow statement is generated based on the transactions "
+"currently in your database. Additional options for custom date ranges and"
+" filtering will be available in future updates."
+msgstr ""
+
+#: templates/ai_analysis.html:37
+msgid "Loading..."
+msgstr ""
+
+#: templates/base.html:22
+msgid "Language"
+msgstr ""
+
+#: templates/base.html:60
+msgid "Home"
+msgstr ""
+
+#: templates/base.html:64 templates/cash_overview.html:6 templates/home.html:33
+msgid "Cash Overview"
+msgstr ""
+
+#: templates/base.html:68 templates/cash_activities.html:6
+#: templates/home.html:42
+msgid "Cash Activities"
+msgstr ""
+
+#: templates/base.html:78
+msgid "Upload"
+msgstr ""
+
+#: templates/cash_activities.html:25
+msgid "Set Initial Cash Balance"
+msgstr ""
+
+#: templates/cash_activities.html:29
+msgid "Set Initial Balance"
+msgstr ""
+
+#: templates/cash_activities.html:36
+msgid "Record Cash Transaction"
+msgstr ""
+
+#: templates/cash_activities.html:38 templates/cash_activities.html:85
+msgid "Date"
+msgstr ""
+
+#: templates/cash_activities.html:42 templates/cash_activities.html:86
+msgid "Description"
+msgstr ""
+
+#: templates/cash_activities.html:46 templates/cash_activities.html:87
+msgid "Amount"
+msgstr ""
+
+#: templates/cash_activities.html:50 templates/cash_activities.html:88
+msgid "Type"
+msgstr ""
+
+#: templates/cash_activities.html:52
+msgid "Cashflow from operation"
+msgstr ""
+
+#: templates/cash_activities.html:53
+msgid "Cash from customers"
+msgstr ""
+
+#: templates/cash_activities.html:54
+msgid "Salary & Supplier payments"
+msgstr ""
+
+#: templates/cash_activities.html:55
+msgid "Interest paid"
+msgstr ""
+
+#: templates/cash_activities.html:56
+msgid "Income taxes"
+msgstr ""
+
+#: templates/cash_activities.html:57
+msgid "Other operating cashflow"
+msgstr ""
+
+#: templates/cash_activities.html:59
+msgid "Cashflow from investment"
+msgstr ""
+
+#: templates/cash_activities.html:60
+msgid "Purchase of property&equipments"
+msgstr ""
+
+#: templates/cash_activities.html:61
+msgid "Sell of property&equipments"
+msgstr ""
+
+#: templates/cash_activities.html:62
+msgid "Purchase of investments"
+msgstr ""
+
+#: templates/cash_activities.html:63
+msgid "Sale of investments"
+msgstr ""
+
+#: templates/cash_activities.html:64
+msgid "Other investing cashflow"
+msgstr ""
+
+#: templates/cash_activities.html:66
+msgid "Cashflow from financing"
+msgstr ""
+
+#: templates/cash_activities.html:67
+msgid "Issuing shares"
+msgstr ""
+
+#: templates/cash_activities.html:68
+msgid "Borrowings"
+msgstr ""
+
+#: templates/cash_activities.html:69
+msgid "Repayment of borrowings"
+msgstr ""
+
+#: templates/cash_activities.html:70
+msgid "Dividends paid"
+msgstr ""
+
+#: templates/cash_activities.html:71
+msgid "Other financing cashflow"
+msgstr ""
+
+#: templates/cash_activities.html:75
+msgid "Add Transaction"
+msgstr ""
+
+#: templates/cash_activities.html:81
+msgid "Transaction Records"
+msgstr ""
+
+#: templates/cash_activities.html:89
+msgid "Actions"
+msgstr ""
+
+#: templates/cash_activities.html:100
+msgid "Edit"
+msgstr ""
+
+#: templates/cash_activities.html:102
+msgid "Delete"
+msgstr ""
+
+#: templates/cash_activities.html:116
+msgid "Previous"
+msgstr ""
+
+#: templates/cash_activities.html:134
+msgid "Next"
+msgstr ""
+
+#: templates/cash_activities.html:144
+msgid "Upload Cashflow Data"
+msgstr ""
+
+#: templates/cash_activities.html:145
+msgid "Export as CSV"
+msgstr ""
+
+#: templates/cash_activities.html:146
+msgid "Export as Excel"
+msgstr ""
+
+#: templates/cash_overview.html:23
+msgid "Cash Flow Overview"
+msgstr ""
+
+#: templates/cash_overview.html:27
+msgid "Initial Cash Balance"
+msgstr ""
+
+#: templates/cash_overview.html:36
+msgid "Cash From Business Operation"
+msgstr ""
+
+#: templates/cash_overview.html:48
+msgid "Cash from Financing and Other Activities"
+msgstr ""
+
+#: templates/cash_overview.html:61
+msgid "Latest Cash Balance"
+msgstr ""
+
+#: templates/cash_overview.html:70
+msgid "Monthly Burn Rate"
+msgstr ""
+
+#: templates/cash_overview.html:76
+msgid "Cash Runway"
+msgstr ""
+
+#: templates/cash_overview.html:91
+msgid "Cash Runway Visualization"
+msgstr ""
+
+#: templates/cash_overview.html:120
+msgid "Balance by Date"
+msgstr ""
+
+#: templates/cash_overview.html:125
+msgid "Calculate Balance"
+msgstr ""
+
+#: templates/cash_overview.html:136
+msgid "Monthly Cash Income"
+msgstr ""
+
+#: templates/cash_overview.html:144
+msgid "Monthly Cash Expenses"
+msgstr ""
+
+#: templates/cash_overview.html:154
+msgid "Monthly Cash Balance Trend"
+msgstr ""
+
+#: templates/cash_overview.html:162
+msgid "Cash-out by Categories"
+msgstr ""
+
+#: templates/home.html:6
+msgid "Dashboard"
+msgstr ""
+
+#: templates/home.html:23
+msgid "  Welcome"
+msgstr ""
+
+#: templates/home.html:24
+msgid "Manage and analyze your cash flow with ease"
+msgstr ""
+
+#: templates/home.html:34
+msgid "View your cash flow summary"
+msgstr ""
+
+#: templates/home.html:43
+msgid "Track your transactions"
+msgstr ""
+
+#: templates/home.html:52
+msgid "Get AI-powered insights"
+msgstr ""
+
+#: templates/home.html:60 templates/upload.html:6
+msgid "Upload Data"
+msgstr ""
+
+#: templates/home.html:61
+msgid "Import your transactions"
+msgstr ""
+
+#: templates/upload.html:11
+msgid "Upload Cash Flow Data"
+msgstr ""
+
+#: templates/upload.html:19
+msgid "Choose CSV or Excel file"
+msgstr ""
+
+#: templates/upload.html:21
+msgid "Supported formats: CSV, Excel (.xlsx, .xls)"
+msgstr ""
+
+#: templates/upload.html:23
+msgid "Upload File"
+msgstr ""
+
+#: templates/upload.html:28
+msgid "Data Preview"
+msgstr ""
+

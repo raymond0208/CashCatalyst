@@ -1,0 +1,332 @@
+# Japanese translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-05-06 23:55+0800\n"
+"PO-Revision-Date: 2025-05-06 13:56+0800\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: templates/ai_analysis.html:6 templates/cash_activities.html:6
+#: templates/cash_overview.html:6 templates/home.html:6 templates/upload.html:6
+msgid "Workspace"
+msgstr "ワークスペース"
+
+#: templates/ai_analysis.html:6 templates/base.html:73 templates/home.html:51
+msgid "AI Analysis"
+msgstr "AI分析"
+
+#: templates/ai_analysis.html:23
+#, fuzzy
+msgid "AI Financial Analysis"
+msgstr "AI分析"
+
+#: templates/ai_analysis.html:27
+msgid "Generate Advanced Analysis"
+msgstr "高度な分析を生成"
+
+#: templates/ai_analysis.html:28
+msgid "Generate Cash Flow Statement"
+msgstr "キャッシュフロー計算書を生成"
+
+#: templates/ai_analysis.html:30
+msgid ""
+"Note: The cash flow statement is generated based on the transactions "
+"currently in your database. Additional options for custom date ranges and"
+" filtering will be available in future updates."
+msgstr "注：キャッシュフロー計算書は、現在データベースにある取引に基づいて生成されます。今後のアップデートで、カスタム日付範囲やフィルタリングのオプションが追加される予定です。"
+
+#: templates/ai_analysis.html:37
+msgid "Loading..."
+msgstr "読み込み中..."
+
+#: templates/base.html:22
+msgid "Language"
+msgstr "言語"
+
+#: templates/base.html:60
+msgid "Home"
+msgstr "ホーム"
+
+#: templates/base.html:64 templates/cash_overview.html:6 templates/home.html:33
+msgid "Cash Overview"
+msgstr "キャッシュ概要"
+
+#: templates/base.html:68 templates/cash_activities.html:6
+#: templates/home.html:42
+msgid "Cash Activities"
+msgstr "現金活動"
+
+#: templates/base.html:78
+msgid "Upload"
+msgstr "アップロード"
+
+#: templates/cash_activities.html:25
+#, fuzzy
+msgid "Set Initial Cash Balance"
+msgstr "初期現金残高"
+
+#: templates/cash_activities.html:29
+#, fuzzy
+msgid "Set Initial Balance"
+msgstr "初期現金残高"
+
+#: templates/cash_activities.html:36
+msgid "Record Cash Transaction"
+msgstr "現金取引を記録"
+
+#: templates/cash_activities.html:38 templates/cash_activities.html:85
+msgid "Date"
+msgstr "日付"
+
+#: templates/cash_activities.html:42 templates/cash_activities.html:86
+msgid "Description"
+msgstr "説明"
+
+#: templates/cash_activities.html:46 templates/cash_activities.html:87
+msgid "Amount"
+msgstr "金額"
+
+#: templates/cash_activities.html:50 templates/cash_activities.html:88
+msgid "Type"
+msgstr "種類"
+
+#: templates/cash_activities.html:52
+#, fuzzy
+msgid "Cashflow from operation"
+msgstr "営業活動による現金"
+
+#: templates/cash_activities.html:53
+#, fuzzy
+msgid "Cash from customers"
+msgstr "営業活動による現金"
+
+#: templates/cash_activities.html:54
+msgid "Salary & Supplier payments"
+msgstr "給与および仕入先への支払い"
+
+#: templates/cash_activities.html:55
+msgid "Interest paid"
+msgstr "支払利息"
+
+#: templates/cash_activities.html:56
+msgid "Income taxes"
+msgstr "所得税"
+
+#: templates/cash_activities.html:57
+msgid "Other operating cashflow"
+msgstr "その他の営業キャッシュフロー"
+
+#: templates/cash_activities.html:59
+#, fuzzy
+msgid "Cashflow from investment"
+msgstr "キャッシュ概要"
+
+#: templates/cash_activities.html:60
+msgid "Purchase of property&equipments"
+msgstr "資産および設備の購入"
+
+#: templates/cash_activities.html:61
+msgid "Sell of property&equipments"
+msgstr "資産および設備の売却"
+
+#: templates/cash_activities.html:62
+msgid "Purchase of investments"
+msgstr "投資の購入"
+
+#: templates/cash_activities.html:63
+msgid "Sale of investments"
+msgstr "投資の売却"
+
+#: templates/cash_activities.html:64
+msgid "Other investing cashflow"
+msgstr "その他の投資キャッシュフロー"
+
+#: templates/cash_activities.html:66
+#, fuzzy
+msgid "Cashflow from financing"
+msgstr "財務およびその他の活動による現金"
+
+#: templates/cash_activities.html:67
+msgid "Issuing shares"
+msgstr "株式の発行"
+
+#: templates/cash_activities.html:68
+msgid "Borrowings"
+msgstr "借入金"
+
+#: templates/cash_activities.html:69
+msgid "Repayment of borrowings"
+msgstr "借入金の返済"
+
+#: templates/cash_activities.html:70
+msgid "Dividends paid"
+msgstr "支払配当金"
+
+#: templates/cash_activities.html:71
+msgid "Other financing cashflow"
+msgstr "その他の財務キャッシュフロー"
+
+#: templates/cash_activities.html:75
+msgid "Add Transaction"
+msgstr "取引を追加"
+
+#: templates/cash_activities.html:81
+msgid "Transaction Records"
+msgstr "取引記録"
+
+#: templates/cash_activities.html:89
+msgid "Actions"
+msgstr "操作"
+
+#: templates/cash_activities.html:100
+msgid "Edit"
+msgstr "編集"
+
+#: templates/cash_activities.html:102
+msgid "Delete"
+msgstr "削除"
+
+#: templates/cash_activities.html:116
+msgid "Previous"
+msgstr "前へ"
+
+#: templates/cash_activities.html:134
+msgid "Next"
+msgstr "次へ"
+
+#: templates/cash_activities.html:144
+msgid "Upload Cashflow Data"
+msgstr "キャッシュフローデータをアップロード"
+
+#: templates/cash_activities.html:145
+msgid "Export as CSV"
+msgstr "CSVとしてエクスポート"
+
+#: templates/cash_activities.html:146
+msgid "Export as Excel"
+msgstr "Excelとしてエクスポート"
+
+#: templates/cash_overview.html:23
+#, fuzzy
+msgid "Cash Flow Overview"
+msgstr "キャッシュ概要"
+
+#: templates/cash_overview.html:27
+msgid "Initial Cash Balance"
+msgstr "初期現金残高"
+
+#: templates/cash_overview.html:36
+msgid "Cash From Business Operation"
+msgstr "営業活動による現金"
+
+#: templates/cash_overview.html:48
+msgid "Cash from Financing and Other Activities"
+msgstr "財務およびその他の活動による現金"
+
+#: templates/cash_overview.html:61
+msgid "Latest Cash Balance"
+msgstr "最新現金残高"
+
+#: templates/cash_overview.html:70
+msgid "Monthly Burn Rate"
+msgstr "月次バーンレート"
+
+#: templates/cash_overview.html:76
+msgid "Cash Runway"
+msgstr "キャッシュランウェイ"
+
+#: templates/cash_overview.html:91
+msgid "Cash Runway Visualization"
+msgstr "キャッシュランウェイの可視化"
+
+#: templates/cash_overview.html:120
+msgid "Balance by Date"
+msgstr "日付別残高"
+
+#: templates/cash_overview.html:125
+msgid "Calculate Balance"
+msgstr "残高を計算"
+
+#: templates/cash_overview.html:136
+msgid "Monthly Cash Income"
+msgstr "月間現金収入"
+
+#: templates/cash_overview.html:144
+msgid "Monthly Cash Expenses"
+msgstr "月間現金支出"
+
+#: templates/cash_overview.html:154
+msgid "Monthly Cash Balance Trend"
+msgstr "月間現金残高の推移"
+
+#: templates/cash_overview.html:162
+msgid "Cash-out by Categories"
+msgstr "カテゴリ別キャッシュアウト"
+
+#: templates/home.html:6
+msgid "Dashboard"
+msgstr "ダッシュボード"
+
+#: templates/home.html:23
+msgid "  Welcome"
+msgstr "ようこそ"
+
+#: templates/home.html:24
+msgid "Manage and analyze your cash flow with ease"
+msgstr "簡単にキャッシュフローを管理・分析できます"
+
+#: templates/home.html:34
+msgid "View your cash flow summary"
+msgstr "キャッシュフローの概要を表示"
+
+#: templates/home.html:43
+msgid "Track your transactions"
+msgstr "取引を追跡"
+
+#: templates/home.html:52
+msgid "Get AI-powered insights"
+msgstr "AIによるインサイトを取得"
+
+#: templates/home.html:60 templates/upload.html:6
+#, fuzzy
+msgid "Upload Data"
+msgstr "アップロード"
+
+#: templates/home.html:61
+msgid "Import your transactions"
+msgstr "取引をインポート"
+
+#: templates/upload.html:11
+#, fuzzy
+msgid "Upload Cash Flow Data"
+msgstr "キャッシュフローデータをアップロード"
+
+#: templates/upload.html:19
+msgid "Choose CSV or Excel file"
+msgstr "CSVまたはExcelファイルを選択"
+
+#: templates/upload.html:21
+msgid "Supported formats: CSV, Excel (.xlsx, .xls)"
+msgstr "対応フォーマット：CSV、Excel（.xlsx、.xls）"
+
+#: templates/upload.html:23
+#, fuzzy
+msgid "Upload File"
+msgstr "ファイルをアップロード"
+
+#: templates/upload.html:28
+msgid "Data Preview"
+msgstr "データプレビュー"
+

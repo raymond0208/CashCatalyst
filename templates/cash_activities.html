@@ -3,7 +3,7 @@
 {% block content %}
     <div class="content-header">
         <div class="breadcrumb-nav">
-            <span>Workspace</span> / <span>Cash Activities</span>
+            <span>{{ _('Workspace') }}</span> / <span>{{ _('Cash Activities') }}</span>
         </div>
     </div>
 
@@ -22,71 +22,71 @@
     <!-- Form to set the initial balance -->
     <div class="initial-balance-section mt-4">
         <form method="POST" action="{{ url_for('set_initial_balance') }}">
-            <h3>Set Initial Cash Balance</h3>
+            <h3>{{  _('Set Initial Cash Balance') }}</h3>
             <div class="mb-3">
                 <input type="number" step="0.01" class="form-control" id="initial_balance" name="initial_balance" required>
             </div>
-            <button type="submit" class="btn btn-secondary">Set Initial Balance</button>
+            <button type="submit" class="btn btn-secondary">{{ _('Set Initial Balance') }}</button>
         </form>
     </div>
 
     <!-- Form to record transaction -->
     <div class="transaction-form-section mt-4">
         <form method="POST" action="{{ url_for('create_transaction') }}">
-            <h3>Record Cash Transaction</h3>
+            <h3>{{ _('Record Cash Transaction') }}</h3>
             <div class="mb-3">
-                <label for="date" class="form-label">Date</label>
+                <label for="date" class="form-label">{{ _('Date') }}</label>
                 <input type="date" class="form-control" id="date" name="date" required>
             </div>
             <div class="mb-3">
-                <label for="description" class="form-label">Description</label>
+                <label for="description" class="form-label">{{ _('Description') }}</label>
                 <input type="text" class="form-control" id="description" name="description" required>
             </div>
             <div class="mb-3">
-                <label for="amount" class="form-label">Amount</label>
+                <label for="amount" class="form-label">{{ _('Amount') }}</label>
                 <input type="number" step="0.01" class="form-control" id="amount" name="amount" required>
             </div>
             <div class="mb-3">
-                <label for="type" class="form-label">Type</label>
+                <label for="type" class="form-label">{{ _('Type') }}</label>
                 <select class="form-select" id="type" name="type">
-                    <optgroup label="Cashflow from operation">
-                        <option value="Cash-customer">Cash from customers</option>
-                        <option value="Salary-suppliers">Salary & Supplier payments</option>
-                        <option value="Interest-paid">Interest paid</option>
-                        <option value="Income-tax">Income taxes</option>
-                        <option value="Other-cfo">Other operating cashflow</option>
+                    <optgroup label="{{ _('Cashflow from operation') }}">
+                        <option value="Cash-customer">{{ _('Cash from customers') }}</option>
+                        <option value="Salary-suppliers">{{ _('Salary & Supplier payments') }}</option>
+                        <option value="Interest-paid">{{ _('Interest paid') }}</option>
+                        <option value="Income-tax">{{ _('Income taxes') }}</option>
+                        <option value="Other-cfo">{{ _('Other operating cashflow') }}</option>
                     </optgroup>
-                    <optgroup label="Cashflow from investment">
-                        <option value="Buy-property-equipments">Purchase of property&equipments</option>
-                        <option value="Sell-property-equipments">Sell of property&equipments</option>
-                        <option value="Buy-investment">Purchase of investments</option>
-                        <option value="Sell-investment">Sale of investments</option>
-                        <option value="Other-cfi">Other investing cashflow</option>
+                    <optgroup label="{{ _('Cashflow from investment') }}">
+                        <option value="Buy-property-equipments">{{ _('Purchase of property&equipments') }}</option>
+                        <option value="Sell-property-equipments">{{ _('Sell of property&equipments') }}</option>
+                        <option value="Buy-investment">{{ _('Purchase of investments') }}</option>
+                        <option value="Sell-investment">{{ _('Sale of investments') }}</option>
+                        <option value="Other-cfi">{{ _('Other investing cashflow') }}</option>
                     </optgroup>
-                    <optgroup label="Cashflow from financing">
-                        <option value="Issue-shares">Issuing shares</option>
-                        <option value="borrowings">Borrowings</option>
-                        <option value="Repay-borrowings">Repayment of borrowings</option>
-                        <option value="Pay-dividends">Dividends paid</option>
-                        <option value="Other-cff">Other financing cashflow</option>
+                    <optgroup label="{{ _('Cashflow from financing') }}">
+                        <option value="Issue-shares">{{ _('Issuing shares') }}</option>
+                        <option value="borrowings">{{ _('Borrowings') }}</option>
+                        <option value="Repay-borrowings">{{ _('Repayment of borrowings') }}</option>
+                        <option value="Pay-dividends">{{ _('Dividends paid') }}</option>
+                        <option value="Other-cff">{{ _('Other financing cashflow') }}</option>
                     </optgroup>
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary">Add Transaction</button>
+            <button type="submit" class="btn btn-primary">{{ _('Add Transaction') }}</button>
         </form>
     </div>
 
     <!-- Record table -->
     <div class="record-table-section mt-4">
-        <h3>Transaction Records</h3>
+        <h3>{{ _('Transaction Records') }}</h3>
         <table class="table" id="transactionTable">
             <thead>
                 <tr>
-                    <th scope="col">Date</th>
-                    <th scope="col">Description</th>
-                    <th scope="col">Amount</th>
-                    <th scope="col">Type</th>
-                    <th scope="col">Actions</th>
+                    <th scope="col">{{ _('Date') }}</th>
+                    <th scope="col">{{ _('Description') }}</th>
+                    <th scope="col">{{ _('Amount') }}</th>
+                    <th scope="col">{{ _('Type') }}</th>
+                    <th scope="col">{{ _('Actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -97,9 +97,9 @@
                     <td>{{ transaction.amount }}</td>
                     <td>{{ transaction.type }}</td>
                     <td>
-                        <a href="{{ url_for('edit_transaction', transaction_id=transaction.id) }}" class="btn btn-primary">Edit</a>
+                        <a href="{{ url_for('edit_transaction', transaction_id=transaction.id) }}" class="btn btn-primary">{{ _('Edit') }}</a>
                         <form action="{{ url_for('delete_transaction', transaction_id=transaction.id) }}" method="POST" style="display:inline;">
-                            <button type="submit" class="btn btn-danger">Delete</button>
+                            <button type="submit" class="btn btn-danger">{{ _('Delete') }}</button>
                         </form>
                     </td>
                 </tr>
@@ -113,7 +113,7 @@
             <ul class="pagination justify-content-center">
                 {% if transactions.has_prev %}
                 <li class="page-item">
-                    <a class="page-link" href="{{ url_for('cash_activities', page=transactions.prev_num) }}">&laquo; Previous</a>
+                    <a class="page-link" href="{{ url_for('cash_activities', page=transactions.prev_num) }}">&laquo; {{ _('Previous') }}</a>
                 </li>
                 {% endif %}
 
@@ -131,7 +131,7 @@
 
                 {% if transactions.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="{{ url_for('cash_activities', page=transactions.next_num) }}">Next &raquo;</a>
+                    <a class="page-link" href="{{ url_for('cash_activities', page=transactions.next_num) }}">{{ _('Next') }} &raquo;</a>
                 </li>
                 {% endif %}
             </ul>
@@ -141,8 +141,8 @@
 
     <!-- Export Buttons -->
     <div class="export-buttons-section mt-4">
-        <a href="{{ url_for('upload_route') }}" class="btn btn-primary">Upload Cashflow Data</a>
-        <a href="{{ url_for('export', file_type='csv') }}" class="btn btn-success">Export as CSV</a>
-        <a href="{{ url_for('export', file_type='excel') }}" class="btn btn-success">Export as Excel</a>
+        <a href="{{ url_for('upload_route') }}" class="btn btn-primary">{{ _('Upload Cashflow Data') }}</a>
+        <a href="{{ url_for('export', file_type='csv') }}" class="btn btn-success">{{ _('Export as CSV') }}</a>
+        <a href="{{ url_for('export', file_type='excel') }}" class="btn btn-success">{{ _('Export as Excel') }}</a>
     </div>
 {% endblock %} 

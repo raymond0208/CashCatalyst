@@ -1,0 +1,336 @@
+# Spanish translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-05-06 23:55+0800\n"
+"PO-Revision-Date: 2025-05-06 13:56+0800\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: templates/ai_analysis.html:6 templates/cash_activities.html:6
+#: templates/cash_overview.html:6 templates/home.html:6 templates/upload.html:6
+msgid "Workspace"
+msgstr "Espacio de trabajo"
+
+#: templates/ai_analysis.html:6 templates/base.html:73 templates/home.html:51
+msgid "AI Analysis"
+msgstr "Análisis de IA"
+
+#: templates/ai_analysis.html:23
+#, fuzzy
+msgid "AI Financial Analysis"
+msgstr "Análisis de IA"
+
+#: templates/ai_analysis.html:27
+msgid "Generate Advanced Analysis"
+msgstr "Generar análisis avanzado"
+
+#: templates/ai_analysis.html:28
+msgid "Generate Cash Flow Statement"
+msgstr "Generar estado de flujo de efectivo"
+
+#: templates/ai_analysis.html:30
+msgid ""
+"Note: The cash flow statement is generated based on the transactions "
+"currently in your database. Additional options for custom date ranges and"
+" filtering will be available in future updates."
+msgstr ""
+"Nota: El estado de flujo de efectivo se genera en base a las "
+"transacciones actualmente en tu base de datos. Opciones adicionales para "
+"rangos de fechas personalizados y filtrado estarán disponibles en futuras"
+" actualizaciones."
+
+#: templates/ai_analysis.html:37
+msgid "Loading..."
+msgstr "Cargando..."
+
+#: templates/base.html:22
+msgid "Language"
+msgstr "Idioma"
+
+#: templates/base.html:60
+msgid "Home"
+msgstr "Inicio"
+
+#: templates/base.html:64 templates/cash_overview.html:6 templates/home.html:33
+msgid "Cash Overview"
+msgstr "Resumen de Efectivo"
+
+#: templates/base.html:68 templates/cash_activities.html:6
+#: templates/home.html:42
+msgid "Cash Activities"
+msgstr "Actividades de Efectivo"
+
+#: templates/base.html:78
+msgid "Upload"
+msgstr "Subir Archivos"
+
+#: templates/cash_activities.html:25
+#, fuzzy
+msgid "Set Initial Cash Balance"
+msgstr "Saldo inicial de efectivo"
+
+#: templates/cash_activities.html:29
+#, fuzzy
+msgid "Set Initial Balance"
+msgstr "Saldo inicial de efectivo"
+
+#: templates/cash_activities.html:36
+msgid "Record Cash Transaction"
+msgstr "Registrar transacción de efectivo"
+
+#: templates/cash_activities.html:38 templates/cash_activities.html:85
+msgid "Date"
+msgstr "Fecha"
+
+#: templates/cash_activities.html:42 templates/cash_activities.html:86
+msgid "Description"
+msgstr "Descripción"
+
+#: templates/cash_activities.html:46 templates/cash_activities.html:87
+msgid "Amount"
+msgstr "Monto"
+
+#: templates/cash_activities.html:50 templates/cash_activities.html:88
+msgid "Type"
+msgstr "Tipo"
+
+#: templates/cash_activities.html:52
+#, fuzzy
+msgid "Cashflow from operation"
+msgstr "Efectivo de operaciones comerciales"
+
+#: templates/cash_activities.html:53
+#, fuzzy
+msgid "Cash from customers"
+msgstr "Efectivo de operaciones comerciales"
+
+#: templates/cash_activities.html:54
+msgid "Salary & Supplier payments"
+msgstr "Pagos de sueldos y a proveedores"
+
+#: templates/cash_activities.html:55
+msgid "Interest paid"
+msgstr "Intereses pagados"
+
+#: templates/cash_activities.html:56
+msgid "Income taxes"
+msgstr "Impuestos sobre la renta"
+
+#: templates/cash_activities.html:57
+msgid "Other operating cashflow"
+msgstr "Otros flujos de efectivo operativos"
+
+#: templates/cash_activities.html:59
+#, fuzzy
+msgid "Cashflow from investment"
+msgstr "Resumen de Efectivo"
+
+#: templates/cash_activities.html:60
+msgid "Purchase of property&equipments"
+msgstr "Compra de propiedades y equipos"
+
+#: templates/cash_activities.html:61
+msgid "Sell of property&equipments"
+msgstr "Venta de propiedades y equipos"
+
+#: templates/cash_activities.html:62
+msgid "Purchase of investments"
+msgstr "Compra de inversiones"
+
+#: templates/cash_activities.html:63
+msgid "Sale of investments"
+msgstr "Venta de inversiones"
+
+#: templates/cash_activities.html:64
+msgid "Other investing cashflow"
+msgstr "Otros flujos de efectivo de inversión"
+
+#: templates/cash_activities.html:66
+#, fuzzy
+msgid "Cashflow from financing"
+msgstr "Efectivo de financiamiento y otras actividades"
+
+#: templates/cash_activities.html:67
+msgid "Issuing shares"
+msgstr "Emisión de acciones"
+
+#: templates/cash_activities.html:68
+msgid "Borrowings"
+msgstr "Préstamos recibidos"
+
+#: templates/cash_activities.html:69
+msgid "Repayment of borrowings"
+msgstr "Reembolso de préstamos"
+
+#: templates/cash_activities.html:70
+msgid "Dividends paid"
+msgstr "Dividendos pagados"
+
+#: templates/cash_activities.html:71
+msgid "Other financing cashflow"
+msgstr "Otros flujos de efectivo de financiamiento"
+
+#: templates/cash_activities.html:75
+msgid "Add Transaction"
+msgstr "Agregar transacción"
+
+#: templates/cash_activities.html:81
+msgid "Transaction Records"
+msgstr "Registros de transacciones"
+
+#: templates/cash_activities.html:89
+msgid "Actions"
+msgstr "Acciones"
+
+#: templates/cash_activities.html:100
+msgid "Edit"
+msgstr "Editar"
+
+#: templates/cash_activities.html:102
+msgid "Delete"
+msgstr "Eliminar"
+
+#: templates/cash_activities.html:116
+msgid "Previous"
+msgstr "Anterior"
+
+#: templates/cash_activities.html:134
+msgid "Next"
+msgstr "Siguiente"
+
+#: templates/cash_activities.html:144
+msgid "Upload Cashflow Data"
+msgstr "Subir datos de flujo de efectivo"
+
+#: templates/cash_activities.html:145
+msgid "Export as CSV"
+msgstr "Exportar como CSV"
+
+#: templates/cash_activities.html:146
+msgid "Export as Excel"
+msgstr "Exportar como Excel"
+
+#: templates/cash_overview.html:23
+#, fuzzy
+msgid "Cash Flow Overview"
+msgstr "Resumen de Efectivo"
+
+#: templates/cash_overview.html:27
+msgid "Initial Cash Balance"
+msgstr "Saldo inicial de efectivo"
+
+#: templates/cash_overview.html:36
+msgid "Cash From Business Operation"
+msgstr "Efectivo de operaciones comerciales"
+
+#: templates/cash_overview.html:48
+msgid "Cash from Financing and Other Activities"
+msgstr "Efectivo de financiamiento y otras actividades"
+
+#: templates/cash_overview.html:61
+msgid "Latest Cash Balance"
+msgstr "Saldo de efectivo actual"
+
+#: templates/cash_overview.html:70
+msgid "Monthly Burn Rate"
+msgstr "Tasa de gasto mensual"
+
+#: templates/cash_overview.html:76
+msgid "Cash Runway"
+msgstr "Autonomía de efectivo"
+
+#: templates/cash_overview.html:91
+msgid "Cash Runway Visualization"
+msgstr "Visualización de autonomía de efectivo"
+
+#: templates/cash_overview.html:120
+msgid "Balance by Date"
+msgstr "Saldo por fecha"
+
+#: templates/cash_overview.html:125
+msgid "Calculate Balance"
+msgstr "Calcular saldo"
+
+#: templates/cash_overview.html:136
+msgid "Monthly Cash Income"
+msgstr "Ingresos mensuales en efectivo"
+
+#: templates/cash_overview.html:144
+msgid "Monthly Cash Expenses"
+msgstr "Gastos mensuales en efectivo"
+
+#: templates/cash_overview.html:154
+msgid "Monthly Cash Balance Trend"
+msgstr "Tendencia mensual del saldo de efectivo"
+
+#: templates/cash_overview.html:162
+msgid "Cash-out by Categories"
+msgstr "Salida de efectivo por categoría"
+
+#: templates/home.html:6
+msgid "Dashboard"
+msgstr "Panel de control"
+
+#: templates/home.html:23
+msgid "  Welcome"
+msgstr "Bienvenido"
+
+#: templates/home.html:24
+msgid "Manage and analyze your cash flow with ease"
+msgstr "Administra y analiza tu flujo de efectivo fácilmente"
+
+#: templates/home.html:34
+msgid "View your cash flow summary"
+msgstr "Ver el resumen de tu flujo de efectivo"
+
+#: templates/home.html:43
+msgid "Track your transactions"
+msgstr "Rastrea tus transacciones"
+
+#: templates/home.html:52
+msgid "Get AI-powered insights"
+msgstr "Obtén información con tecnología de IA"
+
+#: templates/home.html:60 templates/upload.html:6
+#, fuzzy
+msgid "Upload Data"
+msgstr "Subir Archivos"
+
+#: templates/home.html:61
+msgid "Import your transactions"
+msgstr "Importa tus transacciones"
+
+#: templates/upload.html:11
+#, fuzzy
+msgid "Upload Cash Flow Data"
+msgstr "Subir datos de flujo de efectivo"
+
+#: templates/upload.html:19
+msgid "Choose CSV or Excel file"
+msgstr "Elige un archivo CSV o Excel"
+
+#: templates/upload.html:21
+msgid "Supported formats: CSV, Excel (.xlsx, .xls)"
+msgstr "Formatos compatibles: CSV, Excel (.xlsx, .xls)"
+
+#: templates/upload.html:23
+#, fuzzy
+msgid "Upload File"
+msgstr "Subir Archivos"
+
+#: templates/upload.html:28
+msgid "Data Preview"
+msgstr "Vista previa de datos"
+

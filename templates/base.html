@@ -17,6 +17,16 @@
         <header class="main-header">
             <span class="text-logo">CashCatalyst</span>
             <div class="custom-user-controls">
+                <div class="language-selector dropdown">
+                    <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-globe"></i> {{ _('Language') }}
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{{ url_for('set_language', language='en') }}">English</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('set_language', language='es') }}">Español</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('set_language', language='ja') }}">日本語</a></li>
+                    </ul>
+                </div>
                 {% if current_user.is_authenticated %}
                     <div class="user-avatar-dropdown">
                         <button class="user-avatar" id="userMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
@@ -47,25 +57,25 @@
                 <div class="sidebar-menu">
                     <a href="{{ url_for('home') }}" class="menu-item {% if request.endpoint == 'home' %}active{% endif %}">
                         <i class="fas fa-home"></i>
-                        <span>Home</span>
+                        <span>{{ _('Home') }}</span>
                     </a>
                     <a href="{{ url_for('cash_overview') }}" class="menu-item {% if request.endpoint == 'cash_overview' %}active{% endif %}">
                         <i class="fas fa-wallet"></i>
-                        <span>Cash Overview</span>
+                        <span>{{ _('Cash Overview') }}</span>
                     </a>
                     <a href="{{ url_for('cash_activities') }}" class="menu-item {% if request.endpoint == 'cash_activities' %}active{% endif %}">
                         <i class="fas fa-exchange-alt"></i>
-                        <span>Cash Activities</span>
+                        <span>{{ _('Cash Activities') }}</span>
                     </a>
                     {% if user_preferences and 'ai_analysis' in user_preferences.modules %}
                     <a href="{{ url_for('ai_analysis') }}" class="menu-item {% if request.endpoint == 'ai_analysis' %}active{% endif %}">
                         <i class="fas fa-robot"></i>
-                        <span>AI Analysis</span>
+                        <span>{{ _('AI Analysis') }}</span>
                     </a>
                     {% endif %}
                     <a href="{{ url_for('upload_route') }}" class="menu-item {% if request.endpoint == 'upload_route' %}active{% endif %}">
                         <i class="fas fa-upload"></i>
-                        <span>Upload</span>
+                        <span>{{ _('Upload') }}</span>
                     </a>
                 </div>
                 <div class="sidebar-footer">
